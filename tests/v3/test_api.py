@@ -2,10 +2,10 @@ import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
 
-import zarr
-from zarr import Array, Group
-from zarr.abc.store import Store
-from zarr.api.synchronous import create, load, open, open_group, save, save_array, save_group
+import zarrs_python
+from zarrs_python import Array, Group
+from zarrs_python.abc.store import Store
+from zarrs_python.api.synchronous import create, load, open, open_group, save, save_array, save_group
 
 
 def test_create_array(memory_store: Store) -> None:
@@ -121,15 +121,15 @@ def test_load_array(memory_store: Store) -> None:
 
 
 def test_tree() -> None:
-    g1 = zarr.group()
+    g1 = zarrs_python.group()
     g1.create_group("foo")
     g3 = g1.create_group("bar")
     g3.create_group("baz")
     g5 = g3.create_group("qux")
     g5.create_array("baz", shape=100, chunks=10)
     # TODO: complete after tree has been reimplemented
-    # assert repr(zarr.tree(g1)) == repr(g1.tree())
-    # assert str(zarr.tree(g1)) == str(g1.tree())
+    # assert repr(zarrs_python.tree(g1)) == repr(g1.tree())
+    # assert str(zarrs_python.tree(g1)) == str(g1.tree())
 
 
 # @pytest.mark.parametrize("stores_from_path", [False, True])
@@ -524,12 +524,12 @@ def test_tree() -> None:
 #     copy_all used to not copy attributes as `.keys()` does not return hidden `.zattrs`.
 
 #     """
-#     original_group = zarr.group(store=MemoryStore(), overwrite=True)
+#     original_group = zarrs_python.group(store=MemoryStore(), overwrite=True)
 #     original_group.attrs["info"] = "group attrs"
 #     original_subgroup = original_group.create_group("subgroup")
 #     original_subgroup.attrs["info"] = "sub attrs"
 
-#     destination_group = zarr.group(store=MemoryStore(), overwrite=True)
+#     destination_group = zarrs_python.group(store=MemoryStore(), overwrite=True)
 
 #     # copy from memory to directory store
 #     copy_all(

@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from zarr.config import config
+from zarrs_python.config import config
 
 
 def test_config_defaults_set() -> None:

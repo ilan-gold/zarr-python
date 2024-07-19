@@ -10,19 +10,19 @@ import numpy.typing as npt
 import pytest
 from numpy.testing import assert_array_equal
 
-import zarr
-from zarr.abc.store import Store
-from zarr.buffer import BufferPrototype, NDBuffer
-from zarr.common import ChunkCoords
-from zarr.indexing import (
+import zarrs_python
+from zarrs_python.abc.store import Store
+from zarrs_python.buffer import BufferPrototype, NDBuffer
+from zarrs_python.common import ChunkCoords
+from zarrs_python.indexing import (
     make_slice_selection,
     normalize_integer_selection,
     oindex,
     oindex_set,
     replace_ellipsis,
 )
-from zarr.store.core import StorePath
-from zarr.store.memory import MemoryStore
+from zarrs_python.store.core import StorePath
+from zarrs_python.store.memory import MemoryStore
 
 
 @pytest.fixture
@@ -34,8 +34,8 @@ def zarr_array_from_numpy_array(
     store: StorePath,
     a: npt.NDArray[Any],
     chunk_shape: ChunkCoords | None = None,
-) -> zarr.Array:
-    z = zarr.Array.create(
+) -> zarrs_python.Array:
+    z = zarrs_python.Array.create(
         store=store / str(uuid4()),
         shape=a.shape,
         dtype=a.dtype,
@@ -1209,7 +1209,7 @@ def test_get_block_selection_2d(store: StorePath):
         z.get_block_selection(selection)
 
 
-def _test_set_block_selection(v: np.ndarray, a: np.ndarray, z: zarr.Array, selection, expected_idx):
+def _test_set_block_selection(v: np.ndarray, a: np.ndarray, z: zarrs_python.Array, selection, expected_idx):
     for value in 42, v[expected_idx], v[expected_idx].tolist():
         # setup expectation
         a[:] = 0

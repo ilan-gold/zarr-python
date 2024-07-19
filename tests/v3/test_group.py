@@ -2,20 +2,20 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from zarr.array import AsyncArray
-from zarr.buffer import Buffer
-from zarr.store.core import make_store_path
-from zarr.sync import sync
+from zarrs_python.array import AsyncArray
+from zarrs_python.buffer import Buffer
+from zarrs_python.store.core import make_store_path
+from zarrs_python.sync import sync
 
 if TYPE_CHECKING:
-    from zarr.common import ZarrFormat
-    from zarr.store import LocalStore, MemoryStore
+    from zarrs_python.common import zarrs_python as zarrFormat
+    from zarrs_python.store import LocalStore, MemoryStore
 
 import numpy as np
 import pytest
 
-from zarr.group import AsyncGroup, Group, GroupMetadata
-from zarr.store import StorePath
+from zarrs_python.group import AsyncGroup, Group, GroupMetadata
+from zarrs_python.store import StorePath
 
 
 # todo: put RemoteStore in here

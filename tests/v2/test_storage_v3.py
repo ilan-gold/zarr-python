@@ -10,16 +10,16 @@ import pytest
 
 pytest.skip("old v3 tests are disabled", allow_module_level=True)
 
-# import zarr
-# from zarr._storage.store import _get_hierarchy_metadata, v3_api_available, StorageTransformer
-# from zarr._storage.v3_storage_transformers import (
+# import zarrs_python
+# from zarrs_python._storage.store import _get_hierarchy_metadata, v3_api_available, StorageTransformer
+# from zarrs_python._storage.v3_storage_transformers import (
 #     DummyStorageTransfomer,
 #     ShardingStorageTransformer,
 #     v3_sharding_available,
 # )
-# from zarr.core import Array
-# from zarr.meta import _default_entry_point_metadata_v3
-# from zarr.storage import (
+# from zarrs_python.core import Array
+# from zarrs_python.meta import _default_entry_point_metadata_v3
+# from zarrs_python.storage import (
 #     atexit_rmglob,
 #     atexit_rmtree,
 #     data_root,
@@ -29,7 +29,7 @@ pytest.skip("old v3 tests are disabled", allow_module_level=True)
 #     meta_root,
 #     normalize_store_arg,
 # )
-# from zarr._storage.v3 import (
+# from zarrs_python._storage.v3 import (
 #     ABSStoreV3,
 #     ConsolidatedMetadataStoreV3,
 #     DBMStoreV3,

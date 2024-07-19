@@ -6,11 +6,11 @@ from numcodecs.abc import Codec
 from numcodecs.compat import ensure_contiguous_ndarray_like
 from numcodecs.registry import get_codec, register_codec
 
-import zarr.v2.codecs
-from zarr.v2.core import Array
-from zarr.v2.creation import array, empty, full, ones, open_array, zeros
-from zarr.v2.hierarchy import open_group, group
-from zarr.v2.storage import DirectoryStore, MemoryStore, Store, ZipStore
+import zarrs_python.v2.codecs
+from zarrs_python.v2.core import Array
+from zarrs_python.v2.creation import array, empty, full, ones, open_array, zeros
+from zarrs_python.v2.hierarchy import open_group, group
+from zarrs_python.v2.storage import DirectoryStore, MemoryStore, Store, ZipStore
 
 
 class CuPyCPUCompressor(Codec):  # pragma: no cover
@@ -92,7 +92,7 @@ class MyArray(np.ndarray):
 
 def init_compressor(compressor) -> CuPyCPUCompressor:
     if compressor:
-        compressor = getattr(zarr.v2.codecs, compressor)()
+        compressor = getattr(zarrs_python.v2.codecs, compressor)()
     return CuPyCPUCompressor(compressor)
 
 

@@ -3,11 +3,11 @@ import json
 import numpy as np
 import pytest
 
-from zarr.abc.store import Store
-from zarr.array import AsyncArray
-from zarr.buffer import default_buffer_prototype
-from zarr.codecs import BloscCodec, BytesCodec, ShardingCodec
-from zarr.store.core import StorePath
+from zarrs_python.abc.store import Store
+from zarrs_python.array import AsyncArray
+from zarrs_python.buffer import default_buffer_prototype
+from zarrs_python.codecs import BloscCodec, BytesCodec, ShardingCodec
+from zarrs_python.store.core import StorePath
 
 
 @pytest.mark.parametrize("store", ("local", "memory"), indirect=["store"])

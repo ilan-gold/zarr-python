@@ -7,16 +7,16 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from zarr.array import AsyncArray
-from zarr.buffer import ArrayLike, Buffer, BufferPrototype, NDArrayLike, NDBuffer
-from zarr.codecs.blosc import BloscCodec
-from zarr.codecs.bytes import BytesCodec
-from zarr.codecs.crc32c_ import Crc32cCodec
-from zarr.codecs.gzip import GzipCodec
-from zarr.codecs.transpose import TransposeCodec
-from zarr.codecs.zstd import ZstdCodec
-from zarr.store.core import StorePath
-from zarr.store.memory import MemoryStore
+from zarrs_python.array import AsyncArray
+from zarrs_python.buffer import ArrayLike, Buffer, BufferPrototype, NDArrayLike, NDBuffer
+from zarrs_python.codecs.blosc import BloscCodec
+from zarrs_python.codecs.bytes import BytesCodec
+from zarrs_python.codecs.crc32c_ import Crc32cCodec
+from zarrs_python.codecs.gzip import GzipCodec
+from zarrs_python.codecs.transpose import TransposeCodec
+from zarrs_python.codecs.zstd import ZstdCodec
+from zarrs_python.store.core import StorePath
+from zarrs_python.store.memory import MemoryStore
 
 if TYPE_CHECKING:
     from typing_extensions import Self

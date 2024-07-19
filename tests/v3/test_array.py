@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
 
-from zarr.array import Array
-from zarr.common import ZarrFormat
-from zarr.group import Group
-from zarr.store import LocalStore, MemoryStore
+from zarrs_python.array import Array
+from zarrs_python.common import ZarrFormat
+from zarrs_python.group import Group
+from zarrs_python.store import LocalStore, MemoryStore
 
 
 @pytest.mark.parametrize("store", ("local", "memory"), indirect=["store"])

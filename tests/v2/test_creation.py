@@ -7,9 +7,9 @@ import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
 
-from zarr.v2.codecs import Zlib
-from zarr.v2.core import Array
-from zarr.v2.creation import (
+from zarrs_python.v2.codecs import Zlib
+from zarrs_python.v2.core import Array
+from zarrs_python.v2.creation import (
     array,
     create,
     empty,
@@ -23,10 +23,10 @@ from zarr.v2.creation import (
     zeros,
     zeros_like,
 )
-from zarr.v2.hierarchy import open_group
-from zarr.v2.n5 import N5Store
-from zarr.v2.storage import DirectoryStore, KVStore
-from zarr.v2.sync import ThreadSynchronizer
+from zarrs_python.v2.hierarchy import open_group
+from zarrs_python.v2.n5 import N5Store
+from zarrs_python.v2.storage import DirectoryStore, KVStore
+from zarrs_python.v2.sync import ThreadSynchronizer
 from .util import mktemp, have_fsspec
 
 

@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 import pytest
 
-from zarr.metadata import parse_zarr_format_v2
+from zarrs_python.metadata import parse_zarr_format_v2
 
 
 def test_parse_zarr_format_valid() -> None:
