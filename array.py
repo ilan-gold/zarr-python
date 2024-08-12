@@ -12,6 +12,7 @@ import json
 from asyncio import gather
 from collections.abc import Iterable
 from dataclasses import dataclass, field, replace
+from itertools import pairwise
 from typing import Any, Literal, cast
 
 import numpy as np
@@ -462,6 +463,8 @@ class AsyncArray:
                 order=self.order,
                 fill_value=self.metadata.fill_value,
             )
+        if all([isinstance(out_selection, tuple) for _, _, out_selection in indexer]) and all([first_selection.stop == second_selection.start for ((_, _, first_selection), (_, _, second_selection)) in pairwise(indexer)]):
+            return self.rust_array.retrieve_chunk_subset([(chunk_coords, chunk_selection) for chunk_coords, chunk_selection, _ in indexer])
         if product(indexer.shape) > 0:
             # reading chunks and decoding them
             await self.codec_pipeline.read(
