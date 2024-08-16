@@ -68,6 +68,13 @@ from zarrs_python.sync import sync
 from .zarrs_python_internal import open_array as open_array_py, ZarrsPythonArray
 
 
+class DLPackCompat:
+
+    def __init__(self, x):
+        self.x = x
+
+    def __dlpack__(self):
+        return self.x
 
 def parse_array_metadata(data: Any) -> ArrayV2Metadata | ArrayV3Metadata:
     if isinstance(data, ArrayV2Metadata | ArrayV3Metadata):
@@ -463,7 +470,7 @@ class AsyncArray:
                 fill_value=self.metadata.fill_value,
             )
         if all([isinstance(out_selection, tuple) for _, _, out_selection in indexer]) and self.rust_array is not None:
-            return self.rust_array.retrieve_chunk_subset([(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer])
+            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset([(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer])))
         if product(indexer.shape) > 0:
             # reading chunks and decoding them
             await self.codec_pipeline.read(
