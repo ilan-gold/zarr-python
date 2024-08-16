@@ -375,7 +375,6 @@ class AsyncArray:
                 store_path=store_path,
                 metadata=ArrayV3Metadata.from_dict(json.loads(zarr_json_bytes.to_bytes())),
             )
-
             if not isinstance(store_path.store, MemoryStore):
                 object.__setattr__(arr, "rust_array", open_array_py(str(store_path).replace("file://", "")))
             return arr
@@ -463,8 +462,8 @@ class AsyncArray:
                 order=self.order,
                 fill_value=self.metadata.fill_value,
             )
-        if all([isinstance(out_selection, tuple) for _, _, out_selection in indexer]) and all([first_selection.stop == second_selection.start for ((_, _, first_selection), (_, _, second_selection)) in pairwise(indexer)]):
-            return self.rust_array.retrieve_chunk_subset([(chunk_coords, chunk_selection) for chunk_coords, chunk_selection, _ in indexer])
+        if all([isinstance(out_selection, tuple) for _, _, out_selection in indexer]) and self.rust_array is not None:
+            return self.rust_array.retrieve_chunk_subset([(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer])
         if product(indexer.shape) > 0:
             # reading chunks and decoding them
             await self.codec_pipeline.read(
