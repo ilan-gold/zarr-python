@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from zarr.core.sync import SyncError, SyncMixin, _get_lock, _get_loop, sync
+from zarrs_python.core.sync import SyncError, SyncMixin, _get_lock, _get_loop, sync
 
 
 @pytest.fixture(params=[True, False])

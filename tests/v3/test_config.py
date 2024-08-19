@@ -7,16 +7,16 @@ from unittest.mock import Mock
 import numpy as np
 import pytest
 
-import zarr
-from zarr import Array, zeros
-from zarr.abc.codec import CodecInput, CodecOutput, CodecPipeline
-from zarr.abc.store import ByteSetter
-from zarr.codecs import BatchedCodecPipeline, BloscCodec, BytesCodec, Crc32cCodec, ShardingCodec
-from zarr.core.array_spec import ArraySpec
-from zarr.core.buffer import NDBuffer
-from zarr.core.config import BadConfigError, config
-from zarr.core.indexing import SelectorTuple
-from zarr.registry import (
+import zarrs_python
+from zarrs_python import Array, zeros
+from zarrs_python.abc.codec import CodecInput, CodecOutput, CodecPipeline
+from zarrs_python.abc.store import ByteSetter
+from zarrs_python.codecs import BatchedCodecPipeline, BloscCodec, BytesCodec, Crc32cCodec, ShardingCodec
+from zarrs_python.core.array_spec import ArraySpec
+from zarrs_python.core.buffer import NDBuffer
+from zarrs_python.core.config import BadConfigError, config
+from zarrs_python.core.indexing import SelectorTuple
+from zarrs_python.registry import (
     fully_qualified_name,
     get_buffer_class,
     get_codec_class,
@@ -27,7 +27,7 @@ from zarr.registry import (
     register_ndbuffer,
     register_pipeline,
 )
-from zarr.testing.buffer import (
+from zarrs_python.testing.buffer import (
     NDBufferUsingTestNDArrayLike,
     StoreExpectingTestBuffer,
     TestBuffer,
@@ -43,20 +43,20 @@ def test_config_defaults_set() -> None:
             "async": {"concurrency": None, "timeout": None},
             "json_indent": 2,
             "codec_pipeline": {
-                "path": "zarr.codecs.pipeline.BatchedCodecPipeline",
+                "path": "zarrs_python.codecs.pipeline.BatchedCodecPipeline",
                 "batch_size": 1,
             },
-            "buffer": "zarr.core.buffer.Buffer",
-            "ndbuffer": "zarr.core.buffer.NDBuffer",
+            "buffer": "zarrs_python.core.buffer.Buffer",
+            "ndbuffer": "zarrs_python.core.buffer.NDBuffer",
             "codecs": {
-                "blosc": "zarr.codecs.blosc.BloscCodec",
-                "gzip": "zarr.codecs.gzip.GzipCodec",
-                "zstd": "zarr.codecs.zstd.ZstdCodec",
-                "bytes": "zarr.codecs.bytes.BytesCodec",
-                "endian": "zarr.codecs.bytes.BytesCodec",
-                "crc32c": "zarr.codecs.crc32c_.Crc32cCodec",
-                "sharding_indexed": "zarr.codecs.sharding.ShardingCodec",
-                "transpose": "zarr.codecs.transpose.TransposeCodec",
+                "blosc": "zarrs_python.codecs.blosc.BloscCodec",
+                "gzip": "zarrs_python.codecs.gzip.GzipCodec",
+                "zstd": "zarrs_python.codecs.zstd.ZstdCodec",
+                "bytes": "zarrs_python.codecs.bytes.BytesCodec",
+                "endian": "zarrs_python.codecs.bytes.BytesCodec",
+                "crc32c": "zarrs_python.codecs.crc32c_.Crc32cCodec",
+                "sharding_indexed": "zarrs_python.codecs.sharding.ShardingCodec",
+                "transpose": "zarrs_python.codecs.transpose.TransposeCodec",
             },
         }
     ]
@@ -91,8 +91,8 @@ def test_config_codec_pipeline_class(store):
     # has default value
     assert get_pipeline_class().__name__ != ""
 
-    config.set({"codec_pipeline.name": "zarr.codecs.pipeline.BatchedCodecPipeline"})
-    assert get_pipeline_class() == zarr.codecs.pipeline.BatchedCodecPipeline
+    config.set({"codec_pipeline.name": "zarrs_python.codecs.pipeline.BatchedCodecPipeline"})
+    assert get_pipeline_class() == zarrs_python.codecs.pipeline.BatchedCodecPipeline
 
     _mock = Mock()
 

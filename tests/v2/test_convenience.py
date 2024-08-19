@@ -8,8 +8,8 @@ import pytest
 from numcodecs import Adler32, Zlib
 from numpy.testing import assert_array_equal
 
-import zarr.v2 as zarr
-from zarr.v2.convenience import (
+import zarrs_python.v2 as zarrs_python
+from zarrs_python.v2.convenience import (
     consolidate_metadata,
     copy,
     copy_store,
@@ -21,10 +21,10 @@ from zarr.v2.convenience import (
     save_array,
     copy_all,
 )
-from zarr.v2.core import Array
-from zarr.v2.errors import CopyError
-from zarr.v2.hierarchy import Group, group
-from zarr.v2.storage import (
+from zarrs_python.v2.core import Array
+from zarrs_python.v2.errors import CopyError
+from zarrs_python.v2.hierarchy import Group, group
+from zarrs_python.v2.storage import (
     ConsolidatedMetadataStore,
     FSStore,
     MemoryStore,
@@ -127,14 +127,14 @@ def test_load_array():
 
 
 def test_tree():
-    g1 = zarr.group()
+    g1 = zarrs_python.group()
     g1.create_group("foo")
     g3 = g1.create_group("bar")
     g3.create_group("baz")
     g5 = g3.create_group("qux")
     g5.create_dataset("baz", shape=100, chunks=10)
-    assert repr(zarr.tree(g1)) == repr(g1.tree())
-    assert str(zarr.tree(g1)) == str(g1.tree())
+    assert repr(zarrs_python.tree(g1)) == repr(g1.tree())
+    assert str(zarrs_python.tree(g1)) == str(g1.tree())
 
 
 @pytest.mark.parametrize("stores_from_path", [False, True])
@@ -529,12 +529,12 @@ def test_copy_all():
     copy_all used to not copy attributes as `.keys()` does not return hidden `.zattrs`.
 
     """
-    original_group = zarr.group(store=MemoryStore(), overwrite=True)
+    original_group = zarrs_python.group(store=MemoryStore(), overwrite=True)
     original_group.attrs["info"] = "group attrs"
     original_subgroup = original_group.create_group("subgroup")
     original_subgroup.attrs["info"] = "sub attrs"
 
-    destination_group = zarr.group(store=MemoryStore(), overwrite=True)
+    destination_group = zarrs_python.group(store=MemoryStore(), overwrite=True)
 
     # copy from memory to directory store
     copy_all(

@@ -3,10 +3,10 @@ import pytest
 from numpy.testing import assert_array_equal
 from pytest_asyncio import fixture
 
-import zarr
-from zarr import Array, Group
-from zarr.abc.store import Store
-from zarr.api.synchronous import create, load, open, open_group, save, save_array, save_group
+import zarrs_python
+from zarrs_python import Array, Group
+from zarrs_python.abc.store import Store
+from zarrs_python.api.synchronous import create, load, open, open_group, save, save_array, save_group
 
 
 def test_create_array(memory_store: Store) -> None:
@@ -99,9 +99,9 @@ def tmppath(tmpdir):
 def test_open_with_mode_r(tmppath) -> None:
     # 'r' means read only (must exist)
     with pytest.raises(FileNotFoundError):
-        zarr.open(store=tmppath, mode="r")
-    zarr.ones(store=tmppath, shape=(3, 3))
-    z2 = zarr.open(store=tmppath, mode="r")
+        zarrs_python.open(store=tmppath, mode="r")
+    zarrs_python.ones(store=tmppath, shape=(3, 3))
+    z2 = zarrs_python.open(store=tmppath, mode="r")
     assert (z2[:] == 1).all()
     with pytest.raises(ValueError):
         z2[:] = 3
@@ -110,34 +110,34 @@ def test_open_with_mode_r(tmppath) -> None:
 def test_open_with_mode_r_plus(tmppath) -> None:
     # 'r+' means read/write (must exist)
     with pytest.raises(FileNotFoundError):
-        zarr.open(store=tmppath, mode="r+")
-    zarr.ones(store=tmppath, shape=(3, 3))
-    z2 = zarr.open(store=tmppath, mode="r+")
+        zarrs_python.open(store=tmppath, mode="r+")
+    zarrs_python.ones(store=tmppath, shape=(3, 3))
+    z2 = zarrs_python.open(store=tmppath, mode="r+")
     assert (z2[:] == 1).all()
     z2[:] = 3
 
 
 def test_open_with_mode_a(tmppath) -> None:
     # 'a' means read/write (create if doesn't exist)
-    zarr.open(store=tmppath, mode="a", shape=(3, 3))[...] = 1
-    z2 = zarr.open(store=tmppath, mode="a")
+    zarrs_python.open(store=tmppath, mode="a", shape=(3, 3))[...] = 1
+    z2 = zarrs_python.open(store=tmppath, mode="a")
     assert (z2[:] == 1).all()
     z2[:] = 3
 
 
 def test_open_with_mode_w(tmppath) -> None:
     # 'w' means create (overwrite if exists);
-    zarr.open(store=tmppath, mode="w", shape=(3, 3))[...] = 3
-    z2 = zarr.open(store=tmppath, mode="w", shape=(3, 3))
+    zarrs_python.open(store=tmppath, mode="w", shape=(3, 3))[...] = 3
+    z2 = zarrs_python.open(store=tmppath, mode="w", shape=(3, 3))
     assert not (z2[:] == 3).all()
     z2[:] = 3
 
 
 def test_open_with_mode_w_minus(tmppath) -> None:
     # 'w-' means create  (fail if exists)
-    zarr.open(store=tmppath, mode="w-", shape=(3, 3))[...] = 1
+    zarrs_python.open(store=tmppath, mode="w-", shape=(3, 3))[...] = 1
     with pytest.raises(FileExistsError):
-        zarr.open(store=tmppath, mode="w-")
+        zarrs_python.open(store=tmppath, mode="w-")
 
 
 # def test_lazy_loader():
@@ -173,15 +173,15 @@ def test_load_array(memory_store: Store) -> None:
 
 
 def test_tree() -> None:
-    g1 = zarr.group()
+    g1 = zarrs_python.group()
     g1.create_group("foo")
     g3 = g1.create_group("bar")
     g3.create_group("baz")
     g5 = g3.create_group("qux")
     g5.create_array("baz", shape=100, chunks=10)
     # TODO: complete after tree has been reimplemented
-    # assert repr(zarr.tree(g1)) == repr(g1.tree())
-    # assert str(zarr.tree(g1)) == str(g1.tree())
+    # assert repr(zarrs_python.tree(g1)) == repr(g1.tree())
+    # assert str(zarrs_python.tree(g1)) == str(g1.tree())
 
 
 # @pytest.mark.parametrize("stores_from_path", [False, True])
@@ -576,12 +576,12 @@ def test_tree() -> None:
 #     copy_all used to not copy attributes as `.keys()` does not return hidden `.zattrs`.
 
 #     """
-#     original_group = zarr.group(store=MemoryStore(), overwrite=True)
+#     original_group = zarrs_python.group(store=MemoryStore(), overwrite=True)
 #     original_group.attrs["info"] = "group attrs"
 #     original_subgroup = original_group.create_group("subgroup")
 #     original_subgroup.attrs["info"] = "sub attrs"
 
-#     destination_group = zarr.group(store=MemoryStore(), overwrite=True)
+#     destination_group = zarrs_python.group(store=MemoryStore(), overwrite=True)
 
 #     # copy from memory to directory store
 #     copy_all(

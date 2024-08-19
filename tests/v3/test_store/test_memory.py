@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pytest
 
-from zarr.core.buffer import Buffer
-from zarr.store.memory import MemoryStore
-from zarr.testing.store import StoreTests
+from zarrs_python.core.buffer import Buffer
+from zarrs_python.store.memory import MemoryStore
+from zarrs_python.testing.store import StoreTests
 
 
 class TestMemoryStore(StoreTests[MemoryStore]):

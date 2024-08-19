@@ -17,16 +17,16 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 from numcodecs.compat import ensure_bytes
 
-import zarr.v2
-from zarr.v2 import meta_v1
-from zarr.v2.codecs import BZ2, AsType, Blosc, Zlib
-from zarr.v2.context import Context
-from zarr.v2.convenience import consolidate_metadata
-from zarr.v2.errors import ContainsArrayError, ContainsGroupError, MetadataError
-from zarr.v2.hierarchy import group
-from zarr.v2.meta import ZARR_FORMAT, decode_array_metadata
-from zarr.v2.n5 import N5Store, N5FSStore, N5_FORMAT, n5_attrs_key
-from zarr.v2.storage import (
+import zarrs_python.v2
+from zarrs_python.v2 import meta_v1
+from zarrs_python.v2.codecs import BZ2, AsType, Blosc, Zlib
+from zarrs_python.v2.context import Context
+from zarrs_python.v2.convenience import consolidate_metadata
+from zarrs_python.v2.errors import ContainsArrayError, ContainsGroupError, MetadataError
+from zarrs_python.v2.hierarchy import group
+from zarrs_python.v2.meta import ZARR_FORMAT, decode_array_metadata
+from zarrs_python.v2.n5 import N5Store, N5FSStore, N5_FORMAT, n5_attrs_key
+from zarrs_python.v2.storage import (
     ABSStore,
     ConsolidatedMetadataStore,
     DBMStore,
@@ -55,9 +55,9 @@ from zarr.v2.storage import (
     migrate_1to2,
     normalize_store_arg,
 )
-from zarr.v2.storage import FSStore, rename, listdir
+from zarrs_python.v2.storage import FSStore, rename, listdir
 from .util import CountingDict, have_fsspec, skip_test_env_var, abs_container, mktemp
-from zarr.v2.util import ConstantMap, json_dumps
+from zarrs_python.v2.util import ConstantMap, json_dumps
 
 
 @contextmanager
@@ -1072,14 +1072,14 @@ class TestFSStore(StoreTests):
     def test_deep_ndim(self):
         store = self.create_store()
         path = None if self.version == 2 else "group1"
-        foo = zarr.v2.open_group(store=store, path=path)
+        foo = zarrs_python.v2.open_group(store=store, path=path)
         bar = foo.create_group("bar")
         baz = bar.create_dataset("baz", shape=(4, 4, 4), chunks=(2, 2, 2), dtype="i8")
         baz[:] = 1
         if self.version == 2:
             assert set(store.listdir()) == {".zgroup", "bar"}
         else:
-            assert set(store.listdir()) == {"data", "meta", "zarr.v2.json"}
+            assert set(store.listdir()) == {"data", "meta", "zarrs_python.v2.json"}
             assert set(store.listdir("meta/root/" + path)) == {"bar", "bar.group.json"}
             assert set(store.listdir("data/root/" + path)) == {"bar"}
         assert foo["bar"]["baz"][(0, 0, 0)] == 1
@@ -1087,15 +1087,15 @@ class TestFSStore(StoreTests):
     def test_not_fsspec(self):
         path = tempfile.mkdtemp()
         with pytest.raises(ValueError, match="storage_options"):
-            zarr.v2.open_array(path, mode="w", storage_options={"some": "kwargs"})
+            zarrs_python.v2.open_array(path, mode="w", storage_options={"some": "kwargs"})
         with pytest.raises(ValueError, match="storage_options"):
-            zarr.v2.open_group(path, mode="w", storage_options={"some": "kwargs"})
-        zarr.v2.open_array("file://" + path, mode="w", shape=(1,), dtype="f8")
+            zarrs_python.v2.open_group(path, mode="w", storage_options={"some": "kwargs"})
+        zarrs_python.v2.open_array("file://" + path, mode="w", shape=(1,), dtype="f8")
 
     def test_create(self):
         path1 = tempfile.mkdtemp()
         path2 = tempfile.mkdtemp()
-        g = zarr.v2.open_group("file://" + path1, mode="w", storage_options={"auto_mkdir": True})
+        g = zarrs_python.v2.open_group("file://" + path1, mode="w", storage_options={"auto_mkdir": True})
         a = g.create_dataset("data", shape=(8,))
         a[:4] = [0, 1, 2, 3]
         assert "data" in os.listdir(path1)
@@ -1105,7 +1105,7 @@ class TestFSStore(StoreTests):
         consolidate_metadata("file://" + path1)
         assert ".zmetadata" in os.listdir(path1)
 
-        g = zarr.v2.open_group(
+        g = zarrs_python.v2.open_group(
             "simplecache::file://" + path1,
             mode="r",
             storage_options={"cache_storage": path2, "same_names": True},
@@ -1119,19 +1119,19 @@ class TestFSStore(StoreTests):
         url = "file://" + tempfile.mkdtemp()
 
         # create
-        root = zarr.v2.open_group(url, mode="w")
+        root = zarrs_python.v2.open_group(url, mode="w")
         root.zeros("baz", shape=(10000, 10000), chunks=(1000, 1000), dtype="i4")
-        zarr.v2.consolidate_metadata(url)
+        zarrs_python.v2.consolidate_metadata(url)
 
         # reopen and modify
-        root = zarr.v2.open_consolidated(url, mode=mode)
+        root = zarrs_python.v2.open_consolidated(url, mode=mode)
         if allowed:
             root["baz"][0, 0] = 7
 
-            root = zarr.v2.open_consolidated(url, mode="r")
+            root = zarrs_python.v2.open_consolidated(url, mode="r")
             assert root["baz"][0, 0] == 7
         else:
-            with pytest.raises(zarr.v2.errors.ReadOnlyError):
+            with pytest.raises(zarrs_python.v2.errors.ReadOnlyError):
                 root["baz"][0, 0] = 7
 
     @pytest.mark.parametrize("mode", ["r", "r+"])
@@ -1139,13 +1139,13 @@ class TestFSStore(StoreTests):
         url = "file://" + tempfile.mkdtemp()
 
         # create
-        root = zarr.v2.open_group(url, mode="w")
+        root = zarrs_python.v2.open_group(url, mode="w")
         root.zeros("baz", shape=(10000, 10000), chunks=(1000, 1000), dtype="i4")
-        zarr.v2.consolidate_metadata(url)
+        zarrs_python.v2.consolidate_metadata(url)
 
         # reopen and modify
-        root = zarr.v2.open_consolidated(url, mode=mode)
-        with pytest.raises(zarr.v2.errors.ReadOnlyError):
+        root = zarrs_python.v2.open_consolidated(url, mode=mode)
+        with pytest.raises(zarrs_python.v2.errors.ReadOnlyError):
             root["baz"].resize(100, 100)
 
     def test_read_only(self):
@@ -1183,21 +1183,21 @@ class TestFSStore(StoreTests):
 
     @pytest.mark.usefixtures("s3")
     def test_s3(self):
-        g = zarr.v2.open_group("s3://test/out.zarr", mode="w", storage_options=self.s3so)
+        g = zarrs_python.v2.open_group("s3://test/out.zarr", mode="w", storage_options=self.s3so)
         a = g.create_dataset("data", shape=(8,))
         a[:4] = [0, 1, 2, 3]
 
-        g = zarr.v2.open_group("s3://test/out.zarr", mode="r", storage_options=self.s3so)
+        g = zarrs_python.v2.open_group("s3://test/out.zarr", mode="r", storage_options=self.s3so)
 
         assert g.data[:].tolist() == [0, 1, 2, 3, 0, 0, 0, 0]
 
         # test via convenience
-        g = zarr.v2.open("s3://test/out.zarr", mode="r", storage_options=self.s3so)
+        g = zarrs_python.v2.open("s3://test/out.zarr", mode="r", storage_options=self.s3so)
         assert g.data[:].tolist() == [0, 1, 2, 3, 0, 0, 0, 0]
 
     @pytest.mark.usefixtures("s3")
     def test_s3_complex(self):
-        g = zarr.v2.open_group("s3://test/out.zarr", mode="w", storage_options=self.s3so)
+        g = zarrs_python.v2.open_group("s3://test/out.zarr", mode="w", storage_options=self.s3so)
         expected = np.empty((8, 8, 8), dtype="int64")
         expected[:] = -1
         a = g.create_dataset(
@@ -1217,7 +1217,7 @@ class TestFSStore(StoreTests):
             fill_value=(b"b", 1),
         )
         b[:4] = (b"aaa", 2)
-        g2 = zarr.v2.open_group("s3://test/out.zarr", mode="r", storage_options=self.s3so)
+        g2 = zarrs_python.v2.open_group("s3://test/out.zarr", mode="r", storage_options=self.s3so)
 
         assert (g2.data[:] == expected).all()
         a.chunk_store.fs.invalidate_cache("test/out.zarr/data")
@@ -1363,7 +1363,7 @@ class TestNestedDirectoryStore(TestDirectoryStore):
 
     def test_listdir(self):
         store = self.create_store()
-        z = zarr.v2.zeros((10, 10), chunks=(5, 5), store=store)
+        z = zarrs_python.v2.zeros((10, 10), chunks=(5, 5), store=store)
         z[:] = 1  # write to all chunks
         for k in store.listdir():
             assert store.get(k) is not None
@@ -1666,13 +1666,13 @@ class TestNestedFSStore(TestNestedDirectoryStore):
     def test_numbered_groups(self):
         # Create an array
         store = self.create_store()
-        group = zarr.v2.group(store=store)
+        group = zarrs_python.v2.group(store=store)
         arr = group.create_dataset("0", shape=(10, 10))
         arr[1] = 1
 
         # Read it back
         store = self.create_store(path=store.path)
-        zarr.v2.open_group(store.path)["0"]
+        zarrs_python.v2.open_group(store.path)["0"]
 
 
 class TestTempStore(StoreTests):
@@ -2431,7 +2431,7 @@ class TestConsolidatedMetadataStore:
 
 
 def test_fill_value_change():
-    a = zarr.v2.create((10, 10), dtype=int)
+    a = zarrs_python.v2.create((10, 10), dtype=int)
 
     assert a[0, 0] == 0
 
@@ -2467,7 +2467,7 @@ def test_meta_prefix_6853(tmpdir):
     fixture = pathlib.Path(str(tmpdir)) /  "fixture"
     meta = fixture / "meta"
     s = DirectoryStore(str(meta), dimension_separator=".")
-    a = zarr.v2.open(store=s, mode="w", shape=(2, 2), dtype="<i8")
+    a = zarrs_python.v2.open(store=s, mode="w", shape=(2, 2), dtype="<i8")
     a[:] = [[1, 2], [3, 4]]
 
     fixtures = group(store=DirectoryStore(str(fixture)))
@@ -2485,7 +2485,7 @@ def test_getitems_contexts():
             return super().getitems(keys, contexts=contexts)
 
     store = MyStore()
-    z = zarr.v2.create(shape=(10,), chunks=1, store=store)
+    z = zarrs_python.v2.create(shape=(10,), chunks=1, store=store)
 
     # By default, not contexts are given to the store's getitems()
     z[0]

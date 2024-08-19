@@ -3,16 +3,16 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from zarr import AsyncArray
-from zarr.codecs.blosc import BloscCodec
-from zarr.codecs.bytes import BytesCodec
-from zarr.codecs.crc32c_ import Crc32cCodec
-from zarr.codecs.gzip import GzipCodec
-from zarr.codecs.transpose import TransposeCodec
-from zarr.codecs.zstd import ZstdCodec
-from zarr.core.buffer import ArrayLike, BufferPrototype, NDArrayLike, numpy_buffer_prototype
-from zarr.store.common import StorePath
-from zarr.testing.buffer import (
+from zarrs_python import AsyncArray
+from zarrs_python.codecs.blosc import BloscCodec
+from zarrs_python.codecs.bytes import BytesCodec
+from zarrs_python.codecs.crc32c_ import Crc32cCodec
+from zarrs_python.codecs.gzip import GzipCodec
+from zarrs_python.codecs.transpose import TransposeCodec
+from zarrs_python.codecs.zstd import ZstdCodec
+from zarrs_python.core.buffer import ArrayLike, BufferPrototype, NDArrayLike, numpy_buffer_prototype
+from zarrs_python.store.common import StorePath
+from zarrs_python.testing.buffer import (
     NDBufferUsingTestNDArrayLike,
     StoreExpectingTestBuffer,
     TestBuffer,

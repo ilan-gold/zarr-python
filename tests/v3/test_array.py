@@ -3,11 +3,11 @@ from typing import Literal
 import numpy as np
 import pytest
 
-from zarr import Array, Group
-from zarr.core.common import ZarrFormat
-from zarr.errors import ContainsArrayError, ContainsGroupError
-from zarr.store import LocalStore, MemoryStore
-from zarr.store.common import StorePath
+from zarrs_python import Array, Group
+from zarrs_python.core.common import ZarrFormat
+from zarrs_python.errors import ContainsArrayError, ContainsGroupError
+from zarrs_python.store import LocalStore, MemoryStore
+from zarrs_python.store.common import StorePath
 
 
 @pytest.mark.parametrize("store", ("local", "memory"), indirect=["store"])

@@ -1,14 +1,14 @@
 import numcodecs
 import pytest
 
-import zarr.v2
-from zarr.v2.util import InfoReporter
+import zarrs_python.v2
+from zarrs_python.v2.util import InfoReporter
 
 
 @pytest.mark.parametrize("array_size", [10, 15000])
 def test_info(array_size):
     # setup
-    g = zarr.v2.group(store=dict(), chunk_store=dict(), synchronizer=zarr.v2.ThreadSynchronizer())
+    g = zarrs_python.v2.group(store=dict(), chunk_store=dict(), synchronizer=zarrs_python.v2.ThreadSynchronizer())
     g.create_group("foo")
     z = g.zeros("bar", shape=array_size, filters=[numcodecs.Adler32()])
 

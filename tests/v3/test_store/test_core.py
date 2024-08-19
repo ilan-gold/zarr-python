@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from zarr.store.common import make_store_path
-from zarr.store.local import LocalStore
-from zarr.store.memory import MemoryStore
+from zarrs_python.store.common import make_store_path
+from zarrs_python.store.local import LocalStore
+from zarrs_python.store.memory import MemoryStore
 
 
 async def test_make_store_path(tmpdir) -> None:

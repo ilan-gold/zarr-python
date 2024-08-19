@@ -9,8 +9,8 @@ if TYPE_CHECKING:
 import numpy as np
 import pytest
 
-from zarr.core.common import parse_name, parse_shapelike, product
-from zarr.core.config import parse_indexing_order
+from zarrs_python.core.common import parse_name, parse_shapelike, product
+from zarrs_python.core.config import parse_indexing_order
 
 
 @pytest.mark.parametrize("data", [(0, 0, 0, 0), (1, 3, 4, 5, 6), (2, 4)])

@@ -4,9 +4,9 @@ import pytest
 from numpy.testing import assert_array_equal
 from functools import partial
 
-import zarr.v2
-from zarr.v2.core import Array
-from zarr.v2.storage import DirectoryStore, NestedDirectoryStore, FSStore
+import zarrs_python.v2
+from zarrs_python.v2.core import Array
+from zarrs_python.v2.storage import DirectoryStore, NestedDirectoryStore, FSStore
 from .util import have_fsspec
 
 
@@ -60,7 +60,7 @@ def dataset(tmpdir, request) -> None:
 
         #     # store the data - should be one-time operation
         #     s = generator(str(static))
-        #     a = zarr.v2.open(store=s, mode="w", shape=(2, 2), dtype="<i8")
+        #     a = zarrs_python.v2.open(store=s, mode="w", shape=(2, 2), dtype="<i8")
         #     a[:] = [[1, 2], [3, 4]]
 
         return str(static)
@@ -80,7 +80,7 @@ def dataset(tmpdir, request) -> None:
         kwargs["dimension_separator"] = "."
 
     store = store_class(str(loc), **kwargs)
-    zarr.v2.creation.array(store=store, data=[[1, 2], [3, 4]])
+    zarrs_python.v2.creation.array(store=store, data=[[1, 2], [3, 4]])
     return str(loc)
 
 
@@ -96,12 +96,12 @@ def verify(array, expect_failure=False):
 
 def test_open(dataset):
     """
-    Use zarr.v2.open to open the dataset fixture. Legacy nested datasets
+    Use zarrs_python.v2.open to open the dataset fixture. Legacy nested datasets
     without the dimension_separator metadata are not expected to be
     openable.
     """
     failure = "nested_legacy" in dataset
-    verify(zarr.v2.open(dataset, "r"), failure)
+    verify(zarrs_python.v2.open(dataset, "r"), failure)
 
 
 @needs_fsspec
@@ -122,7 +122,7 @@ def test_directory(dataset):
     openable.
     """
     failure = "nested_legacy" in dataset
-    verify(zarr.v2.Array(store=DirectoryStore(dataset)), failure)
+    verify(zarrs_python.v2.Array(store=DirectoryStore(dataset)), failure)
 
 
 def test_nested(dataset):

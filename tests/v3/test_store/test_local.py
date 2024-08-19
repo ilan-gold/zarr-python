@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pytest
 
-from zarr.core.buffer import Buffer
-from zarr.store.local import LocalStore
-from zarr.testing.store import StoreTests
+from zarrs_python.core.buffer import Buffer
+from zarrs_python.store.local import LocalStore
+from zarrs_python.testing.store import StoreTests
 
 
 class TestLocalStore(StoreTests[LocalStore]):

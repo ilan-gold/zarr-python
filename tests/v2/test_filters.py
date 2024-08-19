@@ -12,7 +12,7 @@ from numcodecs import (
 )
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 
-from zarr.v2.creation import array
+from zarrs_python.v2.creation import array
 
 compressors = [
     None,

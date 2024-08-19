@@ -1,8 +1,8 @@
 import pytest
 
-from zarr.v2.n5 import N5ChunkWrapper, N5FSStore
-from zarr.v2.creation import create
-from zarr.v2.storage import atexit_rmtree
+from zarrs_python.v2.n5 import N5ChunkWrapper, N5FSStore
+from zarrs_python.v2.creation import create
+from zarrs_python.v2.storage import atexit_rmtree
 from numcodecs import GZip
 import numpy as np
 from typing import Tuple

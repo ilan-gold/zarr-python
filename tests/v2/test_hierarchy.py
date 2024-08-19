@@ -18,11 +18,11 @@ except ImportError:  # pragma: no cover
 from numcodecs import Zlib
 from numpy.testing import assert_array_equal
 
-from zarr.v2.attrs import Attributes
-from zarr.v2.core import Array
-from zarr.v2.creation import open_array
-from zarr.v2.hierarchy import Group, group, open_group
-from zarr.v2.storage import (
+from zarrs_python.v2.attrs import Attributes
+from zarrs_python.v2.core import Array
+from zarrs_python.v2.creation import open_array
+from zarrs_python.v2.hierarchy import Group, group, open_group
+from zarrs_python.v2.storage import (
     ABSStore,
     DBMStore,
     KVStore,
@@ -42,7 +42,7 @@ from zarr.v2.storage import (
     init_group,
 )
 
-from zarr.v2.util import InfoReporter
+from zarrs_python.v2.util import InfoReporter
 from .util import skip_test_env_var, have_fsspec, abs_container, mktemp
 
 # noinspection PyStatementEffect

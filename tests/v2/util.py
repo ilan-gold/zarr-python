@@ -2,9 +2,9 @@ import collections
 import os
 import tempfile
 from typing import Any, Mapping, Sequence
-from zarr.v2.context import Context
+from zarrs_python.v2.context import Context
 
-from zarr.v2.storage import Store
+from zarrs_python.v2.storage import Store
 
 import pytest
 

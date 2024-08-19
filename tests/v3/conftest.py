@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING
 
 from _pytest.compat import LEGACY_PATH
 
-from zarr import AsyncGroup, config
-from zarr.abc.store import Store
-from zarr.core.common import ChunkCoords, MemoryOrder, ZarrFormat
+from zarrs_python import AsyncGroup, config
+from zarrs_python.abc.store import Store
+from zarrs_python.core.common import ChunkCoords, MemoryOrder, ZarrFormat
 
 if TYPE_CHECKING:
     from typing import Any, Literal
@@ -19,8 +19,8 @@ import numpy as np
 import pytest
 from hypothesis import HealthCheck, Verbosity, settings
 
-from zarr.store import LocalStore, MemoryStore, StorePath
-from zarr.store.remote import RemoteStore
+from zarrs_python.store import LocalStore, MemoryStore, StorePath
+from zarrs_python.store.remote import RemoteStore
 
 
 async def parse_store(

@@ -1,14 +1,14 @@
 import numpy as np
 import pytest
 
-import zarr.v2
-from zarr import Array, AsyncArray, config
-from zarr.abc.codec import Codec
-from zarr.abc.store import Store
-from zarr.codecs import BytesCodec, ShardingCodec, TransposeCodec
-from zarr.core.buffer import default_buffer_prototype
-from zarr.core.common import MemoryOrder
-from zarr.store.common import StorePath
+import zarrs_python.v2
+from zarrs_python import Array, AsyncArray, config
+from zarrs_python.abc.codec import Codec
+from zarrs_python.abc.store import Store
+from zarrs_python.codecs import BytesCodec, ShardingCodec, TransposeCodec
+from zarrs_python.core.buffer import default_buffer_prototype
+from zarrs_python.core.common import MemoryOrder
+from zarrs_python.store.common import StorePath
 
 from .test_codecs import _AsyncArrayProxy
 
@@ -68,7 +68,7 @@ async def test_transpose(
 
     if not with_sharding:
         # Compare with zarr-python
-        z = zarr.v2.create(
+        z = zarrs_python.v2.create(
             shape=data.shape,
             chunks=(1, 32, 8),
             dtype="<u2",

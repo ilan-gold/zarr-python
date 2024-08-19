@@ -9,11 +9,11 @@ from tempfile import mkdtemp
 import numpy as np
 from numpy.testing import assert_array_equal
 
-from zarr.v2.attrs import Attributes
-from zarr.v2.core import Array
-from zarr.v2.hierarchy import Group
-from zarr.v2.storage import DirectoryStore, KVStore, atexit_rmtree, init_array, init_group
-from zarr.v2.sync import ProcessSynchronizer, ThreadSynchronizer
+from zarrs_python.v2.attrs import Attributes
+from zarrs_python.v2.core import Array
+from zarrs_python.v2.hierarchy import Group
+from zarrs_python.v2.storage import DirectoryStore, KVStore, atexit_rmtree, init_array, init_group
+from zarrs_python.v2.sync import ProcessSynchronizer, ThreadSynchronizer
 
 # zarr_version fixture must be imported although not used directly here
 from .test_attrs import TestAttributes

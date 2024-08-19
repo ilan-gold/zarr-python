@@ -8,10 +8,10 @@ import json
 
 import pytest
 
-from zarr.v2.attrs import Attributes
-from zarr.v2.storage import KVStore, DirectoryStore
+from zarrs_python.v2.attrs import Attributes
+from zarrs_python.v2.storage import KVStore, DirectoryStore
 from .util import CountingDict
-from zarr.v2.hierarchy import group
+from zarrs_python.v2.hierarchy import group
 
 
 def _init_store():

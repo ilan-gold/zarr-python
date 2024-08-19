@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
 
-import zarr.v2
-from zarr.v2.indexing import (
+import zarrs_python.v2
+from zarrs_python.v2.indexing import (
     make_slice_selection,
     normalize_integer_selection,
     oindex,
@@ -67,7 +67,7 @@ def test_replace_ellipsis():
 def test_get_basic_selection_0d():
     # setup
     a = np.array(42)
-    z = zarr.v2.create(shape=a.shape, dtype=a.dtype, fill_value=None)
+    z = zarrs_python.v2.create(shape=a.shape, dtype=a.dtype, fill_value=None)
     z[...] = a
 
     assert_array_equal(a, z.get_basic_selection(Ellipsis))
@@ -83,7 +83,7 @@ def test_get_basic_selection_0d():
     # test structured array
     value = (b"aaa", 1, 4.2)
     a = np.array(value, dtype=[("foo", "S3"), ("bar", "i4"), ("baz", "f8")])
-    z = zarr.v2.create(shape=a.shape, dtype=a.dtype, fill_value=None)
+    z = zarrs_python.v2.create(shape=a.shape, dtype=a.dtype, fill_value=None)
     z[()] = value
     assert_array_equal(a, z.get_basic_selection(Ellipsis))
     assert_array_equal(a, z[...])
@@ -189,7 +189,7 @@ def _test_get_basic_selection(a, z, selection):
 def test_get_basic_selection_1d():
     # setup
     a = np.arange(1050, dtype=int)
-    z = zarr.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
     z[:] = a
 
     for selection in basic_selections_1d:
@@ -261,7 +261,7 @@ basic_selections_2d_bad = [
 def test_get_basic_selection_2d():
     # setup
     a = np.arange(10000, dtype=int).reshape(1000, 10)
-    z = zarr.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
     z[:] = a
 
     for selection in basic_selections_2d:
@@ -281,7 +281,7 @@ def test_get_basic_selection_2d():
 
 
 def test_fancy_indexing_fallback_on_get_setitem():
-    z = zarr.v2.zeros((20, 20))
+    z = zarrs_python.v2.zeros((20, 20))
     z[[1, 2, 3], [1, 2, 3]] = 1
     np.testing.assert_array_equal(
         z[:4, :4],
@@ -296,7 +296,7 @@ def test_fancy_indexing_fallback_on_get_setitem():
     # test broadcasting
     np.testing.assert_array_equal(z[1, [1, 2, 3]], [1, 0, 0])
     # test 1D fancy indexing
-    z2 = zarr.v2.zeros(5)
+    z2 = zarrs_python.v2.zeros(5)
     z2[[1, 2, 3]] = 1
     np.testing.assert_array_equal(z2, [0, 1, 1, 1, 0])
 
@@ -331,7 +331,7 @@ def test_orthogonal_indexing_fallback_on_getitem_2d(index, expected_result):
     # [3, 4, 5],
     # [6, 7, 8]
     a = np.arange(9).reshape(3, 3)
-    z = zarr.v2.array(a)
+    z = zarrs_python.v2.array(a)
 
     np.testing.assert_array_equal(z[index], a[index], err_msg="Indexing disagrees with numpy")
     np.testing.assert_array_equal(z[index], expected_result)
@@ -369,7 +369,7 @@ def test_orthogonal_indexing_fallback_on_getitem_3d(index, expected_result):
     #     [21, 22, 23],
     #     [24, 25, 26]]]
     a = np.arange(27).reshape(3, 3, 3)
-    z = zarr.v2.array(a)
+    z = zarrs_python.v2.array(a)
 
     np.testing.assert_array_equal(z[index], a[index], err_msg="Indexing disagrees with numpy")
     np.testing.assert_array_equal(z[index], expected_result)
@@ -397,7 +397,7 @@ def test_orthogonal_indexing_fallback_on_setitem_2d(index, expected_result):
     """
     # Slice + fancy index
     a = np.zeros((3, 3))
-    z = zarr.v2.array(a)
+    z = zarrs_python.v2.array(a)
     z[index] = 1
     a[index] = 1
     np.testing.assert_array_equal(z, expected_result)
@@ -405,7 +405,7 @@ def test_orthogonal_indexing_fallback_on_setitem_2d(index, expected_result):
 
 
 def test_fancy_indexing_doesnt_mix_with_implicit_slicing():
-    z2 = zarr.v2.zeros((5, 5, 5))
+    z2 = zarrs_python.v2.zeros((5, 5, 5))
     with pytest.raises(IndexError):
         z2[[1, 2, 3], [1, 2, 3]] = 2
     with pytest.raises(IndexError):
@@ -420,7 +420,7 @@ def test_set_basic_selection_0d():
     # setup
     v = np.array(42)
     a = np.zeros_like(v)
-    z = zarr.v2.zeros_like(v)
+    z = zarrs_python.v2.zeros_like(v)
     assert_array_equal(a, z)
 
     # tests
@@ -435,7 +435,7 @@ def test_set_basic_selection_0d():
     value = (b"aaa", 1, 4.2)
     v = np.array(value, dtype=[("foo", "S3"), ("bar", "i4"), ("baz", "f8")])
     a = np.zeros_like(v)
-    z = zarr.v2.create(shape=a.shape, dtype=a.dtype, fill_value=None)
+    z = zarrs_python.v2.create(shape=a.shape, dtype=a.dtype, fill_value=None)
 
     # tests
     z.set_basic_selection(Ellipsis, v)
@@ -474,7 +474,7 @@ def _test_get_orthogonal_selection(a, z, selection):
 def test_get_orthogonal_selection_1d_bool():
     # setup
     a = np.arange(1050, dtype=int)
-    z = zarr.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
     z[:] = a
 
     np.random.seed(42)
@@ -496,7 +496,7 @@ def test_get_orthogonal_selection_1d_bool():
 def test_get_orthogonal_selection_1d_int():
     # setup
     a = np.arange(1050, dtype=int)
-    z = zarr.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
     z[:] = a
 
     np.random.seed(42)
@@ -554,7 +554,7 @@ def _test_get_orthogonal_selection_2d(a, z, ix0, ix1):
 def test_get_orthogonal_selection_2d():
     # setup
     a = np.arange(10000, dtype=int).reshape(1000, 10)
-    z = zarr.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
     z[:] = a
 
     np.random.seed(42)
@@ -632,7 +632,7 @@ def _test_get_orthogonal_selection_3d(a, z, ix0, ix1, ix2):
 def test_get_orthogonal_selection_3d():
     # setup
     a = np.arange(100000, dtype=int).reshape(200, 50, 10)
-    z = zarr.v2.create(shape=a.shape, chunks=(60, 20, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(60, 20, 3), dtype=a.dtype)
     z[:] = a
 
     np.random.seed(42)
@@ -661,7 +661,7 @@ def test_get_orthogonal_selection_3d():
 
 def test_orthogonal_indexing_edge_cases():
     a = np.arange(6).reshape(1, 2, 3)
-    z = zarr.v2.create(shape=a.shape, chunks=(1, 2, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(1, 2, 3), dtype=a.dtype)
     z[:] = a
 
     expect = oindex(a, (0, slice(None), [0, 1, 2]))
@@ -695,7 +695,7 @@ def test_set_orthogonal_selection_1d():
     # setup
     v = np.arange(1050, dtype=int)
     a = np.empty(v.shape, dtype=int)
-    z = zarr.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
 
     # test with different degrees of sparseness
     np.random.seed(42)
@@ -735,7 +735,7 @@ def test_set_orthogonal_selection_2d():
     # setup
     v = np.arange(10000, dtype=int).reshape(1000, 10)
     a = np.empty_like(v)
-    z = zarr.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
 
     np.random.seed(42)
     # test with different degrees of sparseness
@@ -790,7 +790,7 @@ def test_set_orthogonal_selection_3d():
     # setup
     v = np.arange(100000, dtype=int).reshape(200, 50, 10)
     a = np.empty_like(v)
-    z = zarr.v2.create(shape=a.shape, chunks=(60, 20, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(60, 20, 3), dtype=a.dtype)
 
     np.random.seed(42)
     # test with different degrees of sparseness
@@ -821,7 +821,7 @@ def test_set_orthogonal_selection_3d():
 
 
 def test_orthogonal_indexing_fallback_on_get_setitem():
-    z = zarr.v2.zeros((20, 20))
+    z = zarrs_python.v2.zeros((20, 20))
     z[[1, 2, 3], [1, 2, 3]] = 1
     np.testing.assert_array_equal(
         z[:4, :4],
@@ -836,7 +836,7 @@ def test_orthogonal_indexing_fallback_on_get_setitem():
     # test broadcasting
     np.testing.assert_array_equal(z[1, [1, 2, 3]], [1, 0, 0])
     # test 1D fancy indexing
-    z2 = zarr.v2.zeros(5)
+    z2 = zarrs_python.v2.zeros(5)
     z2[[1, 2, 3]] = 1
     np.testing.assert_array_equal(z2, [0, 1, 1, 1, 0])
 
@@ -868,7 +868,7 @@ coordinate_selections_1d_bad = [
 def test_get_coordinate_selection_1d():
     # setup
     a = np.arange(1050, dtype=int)
-    z = zarr.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
     z[:] = a
 
     np.random.seed(42)
@@ -911,7 +911,7 @@ def test_get_coordinate_selection_1d():
 def test_get_coordinate_selection_2d():
     # setup
     a = np.arange(10000, dtype=int).reshape(1000, 10)
-    z = zarr.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
     z[:] = a
 
     np.random.seed(42)
@@ -982,7 +982,7 @@ def test_set_coordinate_selection_1d():
     # setup
     v = np.arange(1050, dtype=int)
     a = np.empty(v.shape, dtype=v.dtype)
-    z = zarr.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
 
     np.random.seed(42)
     # test with different degrees of sparseness
@@ -1006,7 +1006,7 @@ def test_set_coordinate_selection_2d():
     # setup
     v = np.arange(10000, dtype=int).reshape(1000, 10)
     a = np.empty_like(v)
-    z = zarr.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
 
     np.random.seed(42)
     # test with different degrees of sparseness
@@ -1088,7 +1088,7 @@ block_selections_1d_bad = [
 def test_get_block_selection_1d():
     # setup
     a = np.arange(1050, dtype=int)
-    z = zarr.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
     z[:] = a
 
     for selection, expected_idx in zip(block_selections_1d, block_selections_1d_array_projection):
@@ -1140,7 +1140,7 @@ block_selections_2d_array_projection = [
 def test_get_block_selection_2d():
     # setup
     a = np.arange(10000, dtype=int).reshape(1000, 10)
-    z = zarr.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
     z[:] = a
 
     for selection, expected_idx in zip(block_selections_2d, block_selections_2d_array_projection):
@@ -1158,7 +1158,7 @@ def test_get_block_selection_2d():
 
 
 def _test_set_block_selection(
-    v: np.ndarray, a: np.ndarray, z: zarr.v2.Array, selection, expected_idx
+    v: np.ndarray, a: np.ndarray, z: zarrs_python.v2.Array, selection, expected_idx
 ):
     for value in 42, v[expected_idx], v[expected_idx].tolist():
         # setup expectation
@@ -1178,7 +1178,7 @@ def test_set_block_selection_1d():
     # setup
     v = np.arange(1050, dtype=int)
     a = np.empty(v.shape, dtype=v.dtype)
-    z = zarr.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
 
     for selection, expected_idx in zip(block_selections_1d, block_selections_1d_array_projection):
         _test_set_block_selection(v, a, z, selection, expected_idx)
@@ -1194,7 +1194,7 @@ def test_set_block_selection_2d():
     # setup
     v = np.arange(10000, dtype=int).reshape(1000, 10)
     a = np.empty(v.shape, dtype=v.dtype)
-    z = zarr.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
 
     for selection, expected_idx in zip(block_selections_2d, block_selections_2d_array_projection):
         _test_set_block_selection(v, a, z, selection, expected_idx)
@@ -1237,7 +1237,7 @@ mask_selections_1d_bad = [
 def test_get_mask_selection_1d():
     # setup
     a = np.arange(1050, dtype=int)
-    z = zarr.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
     z[:] = a
 
     np.random.seed(42)
@@ -1263,7 +1263,7 @@ def test_get_mask_selection_1d():
 def test_get_mask_selection_2d():
     # setup
     a = np.arange(10000, dtype=int).reshape(1000, 10)
-    z = zarr.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
     z[:] = a
 
     np.random.seed(42)
@@ -1296,7 +1296,7 @@ def test_set_mask_selection_1d():
     # setup
     v = np.arange(1050, dtype=int)
     a = np.empty_like(v)
-    z = zarr.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=100, dtype=a.dtype)
 
     np.random.seed(42)
     # test with different degrees of sparseness
@@ -1315,7 +1315,7 @@ def test_set_mask_selection_2d():
     # setup
     v = np.arange(10000, dtype=int).reshape(1000, 10)
     a = np.empty_like(v)
-    z = zarr.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
 
     np.random.seed(42)
     # test with different degrees of sparseness
@@ -1327,7 +1327,7 @@ def test_set_mask_selection_2d():
 def test_get_selection_out():
     # basic selections
     a = np.arange(1050)
-    z = zarr.v2.create(shape=1050, chunks=100, dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=1050, chunks=100, dtype=a.dtype)
     z[:] = a
     selections = [
         slice(50, 150),
@@ -1336,7 +1336,7 @@ def test_get_selection_out():
     ]
     for selection in selections:
         expect = a[selection]
-        out = zarr.v2.create(shape=expect.shape, chunks=10, dtype=expect.dtype, fill_value=0)
+        out = zarrs_python.v2.create(shape=expect.shape, chunks=10, dtype=expect.dtype, fill_value=0)
         z.get_basic_selection(selection, out=out)
         assert_array_equal(expect, out[:])
 
@@ -1345,7 +1345,7 @@ def test_get_selection_out():
 
     # orthogonal selections
     a = np.arange(10000, dtype=int).reshape(1000, 10)
-    z = zarr.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
     z[:] = a
     np.random.seed(42)
     # test with different degrees of sparseness
@@ -1367,7 +1367,7 @@ def test_get_selection_out():
         ]
         for selection in selections:
             expect = oindex(a, selection)
-            # out = zarr.v2.create(shape=expect.shape, chunks=10, dtype=expect.dtype,
+            # out = zarrs_python.v2.create(shape=expect.shape, chunks=10, dtype=expect.dtype,
             #                         fill_value=0)
             out = np.zeros(expect.shape, dtype=expect.dtype)
             z.get_orthogonal_selection(selection, out=out)
@@ -1375,7 +1375,7 @@ def test_get_selection_out():
 
     # coordinate selections
     a = np.arange(10000, dtype=int).reshape(1000, 10)
-    z = zarr.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=(300, 3), dtype=a.dtype)
     z[:] = a
     np.random.seed(42)
     # test with different degrees of sparseness
@@ -1400,7 +1400,7 @@ def test_get_selection_out():
 def test_get_selections_with_fields():
     a = [("aaa", 1, 4.2), ("bbb", 2, 8.4), ("ccc", 3, 12.6)]
     a = np.array(a, dtype=[("foo", "S3"), ("bar", "i4"), ("baz", "f8")])
-    z = zarr.v2.create(shape=a.shape, chunks=2, dtype=a.dtype, fill_value=None)
+    z = zarrs_python.v2.create(shape=a.shape, chunks=2, dtype=a.dtype, fill_value=None)
     z[:] = a
 
     fields_fixture = [
@@ -1507,7 +1507,7 @@ def test_set_selections_with_fields():
     v = [("aaa", 1, 4.2), ("bbb", 2, 8.4), ("ccc", 3, 12.6)]
     v = np.array(v, dtype=[("foo", "S3"), ("bar", "i4"), ("baz", "f8")])
     a = np.empty_like(v)
-    z = zarr.v2.empty_like(v, chunks=2)
+    z = zarrs_python.v2.empty_like(v, chunks=2)
 
     fields_fixture = [
         "foo",
@@ -1675,7 +1675,7 @@ def test_slice_selection_uints():
 
 def test_numpy_int_indexing():
     a = np.arange(1050)
-    z = zarr.v2.create(shape=1050, chunks=100, dtype=a.dtype)
+    z = zarrs_python.v2.create(shape=1050, chunks=100, dtype=a.dtype)
     z[:] = a
     assert a[42] == z[42]
     assert a[np.int64(42)] == z[np.int64(42)]
@@ -1716,7 +1716,7 @@ def test_accessed_chunks(shape, chunks, ops):
 
     # Use a counting dict as the backing store so we can track the items access
     store = CountingDict()
-    z = zarr.v2.create(shape=shape, chunks=chunks, store=store)
+    z = zarrs_python.v2.create(shape=shape, chunks=chunks, store=store)
 
     for ii, (optype, slices) in enumerate(ops):
         # Resolve the slices into the accessed chunks for each dimension

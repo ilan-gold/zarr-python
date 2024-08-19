@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal
 
-from zarr.abc.codec import Codec
+from zarrs_python.abc.codec import Codec
 
 if TYPE_CHECKING:
     from typing import Any
 
 import pytest
 
-from zarr.codecs import GzipCodec
-from zarr.core.metadata import ArrayV2Metadata, parse_zarr_format_v2
+from zarrs_python.codecs import GzipCodec
+from zarrs_python.core.metadata import ArrayV2Metadata, parse_zarr_format_v2
 
 
 def test_parse_zarr_format_valid() -> None:

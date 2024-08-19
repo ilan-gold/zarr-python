@@ -30,15 +30,15 @@ from numcodecs.compat import ensure_bytes, ensure_ndarray
 from numcodecs.tests.common import greetings
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 
-import zarr.v2
-from zarr.v2._storage.store import (
+import zarrs_python.v2
+from zarrs_python.v2._storage.store import (
     BaseStore,
 )
 
-from zarr.v2.core import Array
-from zarr.v2.meta import json_loads
-from zarr.v2.n5 import N5Store, N5FSStore, n5_keywords
-from zarr.v2.storage import (
+from zarrs_python.v2.core import Array
+from zarrs_python.v2.meta import json_loads
+from zarrs_python.v2.n5 import N5Store, N5FSStore, n5_keywords
+from zarrs_python.v2.storage import (
     ABSStore,
     DBMStore,
     DirectoryStore,
@@ -55,7 +55,7 @@ from zarr.v2.storage import (
     normalize_store_arg,
 )
 
-from zarr.v2.util import buffer_size
+from zarrs_python.v2.util import buffer_size
 from .util import abs_container, skip_test_env_var, have_fsspec, mktemp
 
 # noinspection PyMethodMayBeStatic
@@ -721,7 +721,7 @@ class TestArray:
 
         # checks that resizing preserves metadata
         if self.dimension_separator == "/":
-            z_ = zarr.v2.open(z.store)
+            z_ = zarrs_python.v2.open(z.store)
             if hasattr(z_, "dimension_separator"):
                 assert z_.dimension_separator == self.dimension_separator
             z_.store.close()
@@ -2493,7 +2493,7 @@ def test_issue_1279(tmpdir):
     """See <https://github.com/zarr-developers/zarr-python/issues/1279>"""
 
     data = np.arange(25).reshape((5, 5))
-    ds = zarr.v2.create(
+    ds = zarrs_python.v2.create(
         shape=data.shape,
         chunks=(5, 5),
         dtype=data.dtype,
@@ -2504,7 +2504,7 @@ def test_issue_1279(tmpdir):
 
     ds[:] = data
 
-    ds_reopened = zarr.v2.open_array(store=FSStore(url=str(tmpdir), mode="r"))
+    ds_reopened = zarrs_python.v2.open_array(store=FSStore(url=str(tmpdir), mode="r"))
 
     written_data = ds_reopened[:]
     assert_array_equal(data, written_data)

@@ -4,8 +4,8 @@ from unittest import mock
 import numpy as np
 import pytest
 
-from zarr.v2.core import Array
-from zarr.v2.util import (
+from zarrs_python.v2.core import Array
+from zarrs_python.v2.util import (
     ConstantMap,
     all_equal,
     flatten,

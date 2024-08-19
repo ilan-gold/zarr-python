@@ -3,17 +3,17 @@ import pickle
 import numpy as np
 import pytest
 
-from zarr import Array, AsyncArray
-from zarr.abc.store import Store
-from zarr.codecs import (
+from zarrs_python import Array, AsyncArray
+from zarrs_python.abc.store import Store
+from zarrs_python.codecs import (
     BloscCodec,
     BytesCodec,
     ShardingCodec,
     ShardingCodecIndexLocation,
     TransposeCodec,
 )
-from zarr.core.buffer import default_buffer_prototype
-from zarr.store.common import StorePath
+from zarrs_python.core.buffer import default_buffer_prototype
+from zarrs_python.store.common import StorePath
 
 from ..conftest import ArrayRequest
 from .test_codecs import _AsyncArrayProxy, order_from_dim

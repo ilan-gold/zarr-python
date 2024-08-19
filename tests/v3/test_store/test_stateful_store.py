@@ -10,14 +10,14 @@ from hypothesis.stateful import (
     rule,
 )
 
-import zarr
-from zarr.abc.store import AccessMode, Store
-from zarr.core.buffer import Buffer, BufferPrototype, default_buffer_prototype
-from zarr.store import MemoryStore
-from zarr.testing.strategies import key_ranges, paths
+import zarrs_python
+from zarrs_python.abc.store import AccessMode, Store
+from zarrs_python.core.buffer import Buffer, BufferPrototype, default_buffer_prototype
+from zarrs_python.store import MemoryStore
+from zarrs_python.testing.strategies import key_ranges, paths
 
 
-class SyncStoreWrapper(zarr.core.sync.SyncMixin):
+class SyncStoreWrapper(zarrs_python.core.sync.SyncMixin):
     def __init__(self, store: Store):
         """Synchronous Store wrapper
 
@@ -32,19 +32,19 @@ class SyncStoreWrapper(zarr.core.sync.SyncMixin):
     def mode(self) -> AccessMode:
         return self.store.mode
 
-    def set(self, key: str, data_buffer: zarr.core.buffer.Buffer) -> None:
+    def set(self, key: str, data_buffer: zarrs_python.core.buffer.Buffer) -> None:
         return self._sync(self.store.set(key, data_buffer))
 
     def list(self) -> list:
         return self._sync_iter(self.store.list())
 
-    def get(self, key: str, prototype: BufferPrototype) -> zarr.core.buffer.Buffer:
+    def get(self, key: str, prototype: BufferPrototype) -> zarrs_python.core.buffer.Buffer:
         obs = self._sync(self.store.get(key, prototype=prototype))
         return obs
 
     def get_partial_values(
         self, key_ranges: list, prototype: BufferPrototype
-    ) -> zarr.core.buffer.Buffer:
+    ) -> zarrs_python.core.buffer.Buffer:
         obs_partial = self._sync(
             self.store.get_partial_values(prototype=prototype, key_ranges=key_ranges)
         )

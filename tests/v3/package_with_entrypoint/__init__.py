@@ -2,11 +2,11 @@ from collections.abc import Iterable
 
 from numpy import ndarray
 
-from zarr.abc.codec import ArrayBytesCodec, CodecInput, CodecPipeline
-from zarr.codecs import BytesCodec
-from zarr.core.array_spec import ArraySpec
-from zarr.core.buffer import Buffer, NDBuffer
-from zarr.core.common import BytesLike
+from zarrs_python.abc.codec import ArrayBytesCodec, CodecInput, CodecPipeline
+from zarrs_python.codecs import BytesCodec
+from zarrs_python.core.array_spec import ArraySpec
+from zarrs_python.core.buffer import Buffer, NDBuffer
+from zarrs_python.core.common import BytesLike
 
 
 class TestEntrypointCodec(ArrayBytesCodec):

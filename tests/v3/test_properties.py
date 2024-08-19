@@ -7,7 +7,7 @@ pytest.importorskip("hypothesis")
 import hypothesis.extra.numpy as npst  # noqa
 import hypothesis.strategies as st  # noqa
 from hypothesis import given, settings  # noqa
-from zarr.testing.strategies import arrays, np_arrays, basic_indices  # noqa
+from zarrs_python.testing.strategies import arrays, np_arrays, basic_indices  # noqa
 
 
 @given(st.data())
