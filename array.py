@@ -470,7 +470,7 @@ class AsyncArray:
                 fill_value=self.metadata.fill_value,
             )
         if all([isinstance(out_selection, tuple) for _, _, out_selection in indexer]) and self.rust_array is not None:
-            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset([(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer])))
+            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(indexer.shape, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer])))
         if product(indexer.shape) > 0:
             # reading chunks and decoding them
             await self.codec_pipeline.read(
