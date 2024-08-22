@@ -219,7 +219,8 @@ class AsyncArray:
         if data is not None:
             # insert user-provided data
             await result.setitem(..., data)
-
+        if not isinstance(store_path.store, MemoryStore):
+            object.__setattr__(result, "rust_array", open_array_py(str(store_path).replace("file://", "")))
         return result
 
     @classmethod
@@ -276,7 +277,6 @@ class AsyncArray:
         )
 
         array = cls(metadata=metadata, store_path=store_path)
-
         await array._save_metadata(metadata)
         return array
 

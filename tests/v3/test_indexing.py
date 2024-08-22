@@ -21,14 +21,18 @@ from zarrs_python.core.indexing import (
     oindex_set,
     replace_ellipsis,
 )
+from zarrs_python.core.sync import sync
 from zarrs_python.registry import get_ndbuffer_class
 from zarrs_python.store.common import StorePath
 from zarrs_python.store.memory import MemoryStore
+from zarrs_python.store.local import LocalStore
 
+import tempfile
 
 @pytest.fixture
-async def store() -> Iterator[Store]:
-    yield StorePath(await MemoryStore.open(mode="w"))
+def store() -> StorePath:
+    path = tempfile.mkdtemp()
+    return StorePath(sync(LocalStore.open(path, mode="w")))
 
 
 def zarr_array_from_numpy_array(
@@ -47,10 +51,11 @@ def zarr_array_from_numpy_array(
     return z
 
 
-class CountingDict(MemoryStore):
+class CountingDict(LocalStore):
     @classmethod
     async def open(cls):
-        store = await super().open(mode="w")
+        path = tempfile.mkdtemp()
+        store = await super().open(path, mode="w")
         store.counter = Counter()
         return store
 
