@@ -111,6 +111,7 @@ class AsyncArray:
         metadata: ArrayMetadata,
         store_path: StorePath,
         order: Literal["C", "F"] | None = None,
+        rust_array: ZarrsPythonArray | None = None,
     ):
         metadata_parsed = parse_array_metadata(metadata)
         order_parsed = parse_indexing_order(order or config.get("array.order"))
@@ -119,6 +120,7 @@ class AsyncArray:
         object.__setattr__(self, "store_path", store_path)
         object.__setattr__(self, "order", order_parsed)
         object.__setattr__(self, "codec_pipeline", create_codec_pipeline(metadata=metadata_parsed))
+        object.__setattr__(self, "rust_array", rust_array)
 
     @classmethod
     async def create(
