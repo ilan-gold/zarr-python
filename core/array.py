@@ -462,6 +462,8 @@ class AsyncArray:
         # check fields are sensible
         out_dtype = check_fields(fields, self.dtype)
 
+        if all([isinstance(out_selection, tuple) for _, _, out_selection in indexer]) and self.rust_array is not None:
+            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(indexer.shape, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer])))
         # setup output buffer
         if out is not None:
             if isinstance(out, NDBuffer):
@@ -479,8 +481,6 @@ class AsyncArray:
                 order=self.order,
                 fill_value=self.metadata.fill_value,
             )
-        if all([isinstance(out_selection, tuple) for _, _, out_selection in indexer]) and self.rust_array is not None:
-            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(indexer.shape, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer])))
         if product(indexer.shape) > 0:
             # reading chunks and decoding them
             await self.codec_pipeline.read(
