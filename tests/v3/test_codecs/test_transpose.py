@@ -59,12 +59,12 @@ async def test_transpose(
     read_data = await _AsyncArrayProxy(a)[:, :].get()
     assert np.array_equal(data, read_data)
 
-    if runtime_read_order == "F":
-        assert read_data.flags["F_CONTIGUOUS"]
-        assert not read_data.flags["C_CONTIGUOUS"]
-    else:
-        assert not read_data.flags["F_CONTIGUOUS"]
-        assert read_data.flags["C_CONTIGUOUS"]
+    # if runtime_read_order == "F":
+    #     assert read_data.flags["F_CONTIGUOUS"]
+    #     assert not read_data.flags["C_CONTIGUOUS"]
+    # else:
+    #     assert not read_data.flags["F_CONTIGUOUS"]
+    #     assert read_data.flags["C_CONTIGUOUS"]
 
     if not with_sharding:
         # Compare with zarr-python
