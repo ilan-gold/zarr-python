@@ -145,7 +145,9 @@ class LocalStore(Store):
             args.append((_get, path, prototype, byte_range))
         return await concurrent_map(args, to_thread, limit=None)  # TODO: fix limit
 
-    async def set(self, key: str, value: Buffer) -> None:
+    async def set(self, key: str, value: Buffer, byte_range: tuple[int, int] | None = None) -> None:
+        if byte_range is not None:
+            raise NotImplementedError("Store.set does not have partial writes yet")
         if not self._is_open:
             await self._open()
         self._check_writable()
