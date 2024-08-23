@@ -30,9 +30,9 @@ from zarrs_python.store.local import LocalStore
 import tempfile
 
 @pytest.fixture
-def store() -> StorePath:
+async def store() -> Iterator[Store]:
     path = tempfile.mkdtemp()
-    return StorePath(sync(LocalStore.open(path, mode="w")))
+    yield StorePath(await LocalStore.open(path, mode="w"))
 
 
 def zarr_array_from_numpy_array(
