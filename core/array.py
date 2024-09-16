@@ -473,8 +473,22 @@ class AsyncArray:
                         return slice(start, stop)
                     raise ValueError(f"The array {obj} does not contain consecutive integers.")
                 return obj
+            def fill_o_index(o_index_tuple, int_index_location):
+                new_selection = [1] * len(self.shape)
+                new_selection[int_index_location] = o_index_tuple[0]
+                return tuple(new_selection)
             indexer_with_out_as_range = [(chunk_coords, chunk_selection, tuple([to_range(s) for s in out_selection]) if hasattr(out_selection, '__iter__') else out_selection) for chunk_coords, chunk_selection, out_selection in indexer]
-            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(indexer.shape, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range])))
+            out_shape = indexer.shape
+            is_o_index = all(sum(isinstance(axis_selection, int) for axis_selection in chunk_selection) == (len(self.shape) - 1) for _, chunk_selection, _ in indexer)
+            if is_o_index:
+                expanded_out_shape = [1] * len(self.shape)
+                int_index_location = next(i for i,v in enumerate(list(indexer)[0][1]) if not isinstance(v, int)) 
+                expanded_out_shape[int_index_location] = self.shape[int_index_location]
+                out_shape = tuple(expanded_out_shape)
+                res = np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, [(chunk_coords, chunk_selection, fill_o_index(out_selection, int_index_location)) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range])))
+                res.x.shape = (expanded_out_shape[int_index_location], )
+                return res
+            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range])))
         # setup output buffer
         if out is not None:
             if isinstance(out, NDBuffer):
