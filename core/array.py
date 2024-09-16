@@ -462,7 +462,7 @@ class AsyncArray:
         # check fields are sensible
         out_dtype = check_fields(fields, self.dtype)
 
-        if all([isinstance(out_selection, tuple) for _, _, out_selection in indexer]) and self.rust_array is not None:
+        if product(indexer.shape) > 0 and all([isinstance(out_selection, tuple) for _, _, out_selection in indexer]) and self.rust_array is not None:
             def to_range(obj):
                 if isinstance(obj, np.ndarray):
                     obj = obj.ravel()
