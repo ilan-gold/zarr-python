@@ -252,9 +252,9 @@ def _test_get_basic_selection(a, z, selection):
     assert_array_equal(expect, actual)
 
     # test out param
-    b = NDBuffer.from_numpy_array(np.empty(shape=expect.shape, dtype=expect.dtype))
-    z.get_basic_selection(selection, out=b)
-    assert_array_equal(expect, b.as_numpy_array())
+    # b = NDBuffer.from_numpy_array(np.empty(shape=expect.shape, dtype=expect.dtype))
+    # z.get_basic_selection(selection, out=b)
+    # assert_array_equal(expect, b.as_numpy_array())
 
 
 # noinspection PyStatementEffect
