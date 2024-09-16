@@ -463,7 +463,18 @@ class AsyncArray:
         out_dtype = check_fields(fields, self.dtype)
 
         if all([isinstance(out_selection, tuple) for _, _, out_selection in indexer]) and self.rust_array is not None:
-            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(indexer.shape, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer])))
+            def to_range(obj):
+                if isinstance(obj, np.ndarray):
+                    obj = obj.ravel()
+                    if np.all(np.diff(obj) == 1):
+                        # Get the start and stop of the range
+                        start = obj[0]
+                        stop = obj[-1] + 1  # 'stop' in slice is exclusive
+                        return slice(start, stop)
+                    raise ValueError(f"The array {obj} does not contain consecutive integers.")
+                return obj
+            indexer_with_out_as_range = [(chunk_coords, chunk_selection, tuple([to_range(s) for s in out_selection]) if hasattr(out_selection, '__iter__') else out_selection) for chunk_coords, chunk_selection, out_selection in indexer]
+            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(indexer.shape, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range])))
         # setup output buffer
         if out is not None:
             if isinstance(out, NDBuffer):
