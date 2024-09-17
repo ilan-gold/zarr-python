@@ -479,13 +479,13 @@ class AsyncArray:
                 return tuple(new_selection)
             indexer_with_out_as_range = [(chunk_coords, chunk_selection, tuple([to_range(s) for s in out_selection]) if hasattr(out_selection, '__iter__') else out_selection) for chunk_coords, chunk_selection, out_selection in indexer]
             out_shape = indexer.shape
-            is_o_index = all(sum(isinstance(axis_selection, int) for axis_selection in chunk_selection) == (len(self.shape) - 1) for _, chunk_selection, _ in indexer)
-            if is_o_index:
+            int_slice_index = all(sum(isinstance(axis_selection, int) for axis_selection in chunk_selection) == (len(self.shape) - 1) for _, chunk_selection, _ in indexer)
+            if int_slice_index:
                 expanded_out_shape = [1] * len(self.shape)
-                int_index_location = next(i for i,v in enumerate(list(indexer)[0][1]) if not isinstance(v, int)) 
-                expanded_out_shape[int_index_location] = self.shape[int_index_location]
+                not_int_index_location = next(i for i,v in enumerate(list(indexer)[0][1]) if not isinstance(v, int)) 
+                expanded_out_shape[not_int_index_location] = indexer.shape[0]
                 out_shape = tuple(expanded_out_shape)
-                return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, True, [(chunk_coords, chunk_selection, fill_o_index(out_selection, int_index_location)) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
+                return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, True, [(chunk_coords, chunk_selection, fill_o_index(out_selection, not_int_index_location)) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
             return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, False, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range])))
         # setup output buffer
         if out is not None:
