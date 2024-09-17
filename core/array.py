@@ -465,7 +465,7 @@ class AsyncArray:
         are_out_selections_tuples = all([isinstance(out_selection, tuple) for _, _, out_selection in indexer])
         is_out_index_range_able = all([(all([(isinstance(s, np.ndarray) and np.all(np.diff(s.ravel()) == 1)) or not isinstance(s, np.ndarray) for s in out_selection]) if hasattr(out_selection, '__iter__') else out_selection) for _, _, out_selection in indexer])
         is_nd_out = product(indexer.shape) > 0
-        is_step_size_one = all([all([(isinstance(s, slice) and (s.step == 1 or s.step is None)) or not isinstance(s, slice) for s in (*selection, *out_selection)]) for _, selection, out_selection in indexer])
+        is_step_size_one = all([all([(isinstance(s, slice) and (s.step == 1 or s.step is None)) or not isinstance(s, slice) for s in (*(selection if isinstance(selection, tuple) else ()), *(out_selection if isinstance(out_selection, tuple) else ()))]) for _, selection, out_selection in indexer])
         can_use_rust = is_out_index_range_able and is_nd_out and are_out_selections_tuples and is_step_size_one
 
         if can_use_rust and self.rust_array is not None:
