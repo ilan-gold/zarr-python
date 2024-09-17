@@ -462,7 +462,14 @@ class AsyncArray:
         # check fields are sensible
         out_dtype = check_fields(fields, self.dtype)
 
-        if product(indexer.shape) > 0 and all([isinstance(out_selection, tuple) for _, _, out_selection in indexer]) and self.rust_array is not None:
+        are_out_selections_tuples = all([isinstance(out_selection, tuple) for _, _, out_selection in indexer])
+        is_out_index_range_able = all([(all([(isinstance(s, np.ndarray) and np.all(np.diff(s.ravel()) == 1)) or not isinstance(s, np.ndarray) for s in out_selection]) if hasattr(out_selection, '__iter__') else out_selection) for _, _, out_selection in indexer])
+        is_nd_out = product(indexer.shape) > 0
+        is_step_size_one = all([all([(isinstance(s, slice) and (s.step == 1 or s.step is None)) or not isinstance(s, slice) for s in (*selection, *out_selection)]) for _, selection, out_selection in indexer])
+        can_use_rust = is_out_index_range_able and is_nd_out and are_out_selections_tuples and is_step_size_one
+
+        if can_use_rust and self.rust_array is not None:
+            # print([out_selection for _, _, out_selection in indexer], indexer.shape, self.shape)
             def to_range(obj):
                 if isinstance(obj, np.ndarray):
                     obj = obj.ravel()
@@ -479,14 +486,21 @@ class AsyncArray:
                 return tuple(new_selection)
             indexer_with_out_as_range = [(chunk_coords, chunk_selection, tuple([to_range(s) for s in out_selection]) if hasattr(out_selection, '__iter__') else out_selection) for chunk_coords, chunk_selection, out_selection in indexer]
             out_shape = indexer.shape if len(indexer.shape) > 0 else (1, )
-            is_int_slice_index = all(sum(isinstance(axis_selection, int) for axis_selection in chunk_selection) == (len(self.shape) - 1) for _, chunk_selection, _ in indexer)
+            is_int_slice_index = all(sum(isinstance(axis_selection, int) for axis_selection in chunk_selection) not in ((len(self.shape) - 1), 0) for _, chunk_selection, _ in indexer)
             if is_int_slice_index:
                 expanded_out_shape = [1] * len(self.shape)
                 not_int_index_location = next(i for i,v in enumerate(list(indexer)[0][1]) if not isinstance(v, int)) 
                 expanded_out_shape[not_int_index_location] = indexer.shape[0]
                 out_shape = tuple(expanded_out_shape)
                 return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, True, [(chunk_coords, chunk_selection, fill_o_index(out_selection, not_int_index_location)) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
-            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, False, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range])))
+            if len(out_shape) == 1 and len(self.shape) > 1:
+                expanded_out_shape = [1] * len(self.shape)
+                not_singleton_index_location = next(i for i,v in enumerate(list(indexer)[0][1]) if not isinstance(v, int) or not (isinstance(v, np.ndarray) and product(v.shape) > 1)) 
+                expanded_out_shape[not_singleton_index_location] = indexer.shape[0]
+                out_shape = tuple(expanded_out_shape)
+                return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, False, [(chunk_coords, chunk_selection, fill_o_index(out_selection, not_singleton_index_location)) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
+            print(out_shape, indexer.shape, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range])
+            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, False, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
         # setup output buffer
         if out is not None:
             if isinstance(out, NDBuffer):
