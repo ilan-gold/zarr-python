@@ -478,9 +478,9 @@ class AsyncArray:
                 new_selection[int_index_location] = o_index_tuple[0]
                 return tuple(new_selection)
             indexer_with_out_as_range = [(chunk_coords, chunk_selection, tuple([to_range(s) for s in out_selection]) if hasattr(out_selection, '__iter__') else out_selection) for chunk_coords, chunk_selection, out_selection in indexer]
-            out_shape = indexer.shape
-            int_slice_index = all(sum(isinstance(axis_selection, int) for axis_selection in chunk_selection) == (len(self.shape) - 1) for _, chunk_selection, _ in indexer)
-            if int_slice_index:
+            out_shape = indexer.shape if len(indexer.shape) > 0 else (1, )
+            is_int_slice_index = all(sum(isinstance(axis_selection, int) for axis_selection in chunk_selection) == (len(self.shape) - 1) for _, chunk_selection, _ in indexer)
+            if is_int_slice_index:
                 expanded_out_shape = [1] * len(self.shape)
                 not_int_index_location = next(i for i,v in enumerate(list(indexer)[0][1]) if not isinstance(v, int)) 
                 expanded_out_shape[not_int_index_location] = indexer.shape[0]
