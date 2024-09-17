@@ -51,11 +51,10 @@ def zarr_array_from_numpy_array(
     return z
 
 
-class CountingDict(LocalStore):
+class CountingDict(MemoryStore):
     @classmethod
     async def open(cls):
-        path = tempfile.mkdtemp()
-        store = await super().open(path, mode="w")
+        store = await super().open(mode="w")
         store.counter = Counter()
         return store
 

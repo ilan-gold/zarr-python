@@ -499,7 +499,6 @@ class AsyncArray:
                 expanded_out_shape[not_singleton_index_location] = indexer.shape[0]
                 out_shape = tuple(expanded_out_shape)
                 return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, False, [(chunk_coords, chunk_selection, fill_o_index(out_selection, not_singleton_index_location)) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
-            print(out_shape, indexer.shape, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range])
             return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, False, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
         # setup output buffer
         if out is not None:
