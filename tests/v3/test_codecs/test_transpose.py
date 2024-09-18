@@ -16,7 +16,7 @@ from .test_codecs import _AsyncArrayProxy
 @pytest.mark.parametrize("runtime_write_order", ["F", "C"])
 @pytest.mark.parametrize("runtime_read_order", ["F", "C"])
 @pytest.mark.parametrize("with_sharding", [True, False])
-@pytest.mark.parametrize("store", (pytest.param("local", marks=pytest.mark.xfail(reason="transpose not implemented")), "memory"), indirect=["store"])
+@pytest.mark.parametrize("store", ("local", "memory"), indirect=["store"])
 async def test_transpose(
     store: Store,
     input_order: MemoryOrder,
