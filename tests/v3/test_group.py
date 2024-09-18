@@ -291,7 +291,7 @@ def test_group_subgroups(store: MemoryStore | LocalStore, zarr_format: ZarrForma
     assert len(subgroups_observed) == len(subgroups_expected)
     assert all(a in subgroups_observed for a in subgroups_expected)
 
-@pytest.xfail(reason="Array equality is problematic for rust-backed arrays ATM.")
+@pytest.mark.xfail(reason="Array equality is problematic for rust-backed arrays ATM.")
 def test_group_subarrays(store: MemoryStore | LocalStore, zarr_format: ZarrFormat) -> None:
     """
     Test the behavior of `Group` methods for accessing subgroups, namely `Group.group_keys` and `Group.groups`
