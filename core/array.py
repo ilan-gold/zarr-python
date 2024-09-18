@@ -336,7 +336,10 @@ class AsyncArray:
         data: dict[str, JSON],
     ) -> AsyncArray:
         metadata = parse_array_metadata(data)
-        async_array = cls(metadata=metadata, store_path=store_path)
+        rust_array_arg = {"rust_array": None}
+        if not isinstance(store_path.store, MemoryStore):
+            rust_array_arg["rust_array"] = open_array_py(str(store_path).replace("file://", ""))
+        async_array = cls(metadata=metadata, store_path=store_path, **rust_array_arg)
         return async_array
 
     @classmethod
