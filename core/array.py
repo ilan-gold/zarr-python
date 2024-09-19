@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 import json
 from asyncio import gather
 from collections.abc import Iterable
@@ -467,7 +468,7 @@ class AsyncArray:
 
         are_out_selections_tuples = all([isinstance(out_selection, tuple) for _, _, out_selection in indexer])
         is_out_index_range_able = all([(all([(isinstance(s, np.ndarray) and np.all(np.diff(s.ravel()) == 1)) or not isinstance(s, np.ndarray) for s in out_selection]) if hasattr(out_selection, '__iter__') else out_selection) for _, _, out_selection in indexer])
-        is_nd_out = product(indexer.shape) > 0
+        is_nd_out = product(indexer.shape) > 0 and len(indexer.shape) > 0
         is_step_size_one = all([all([(isinstance(s, slice) and (s.step == 1 or s.step is None)) or not isinstance(s, slice) for s in (*(selection if isinstance(selection, tuple) else ()), *(out_selection if isinstance(out_selection, tuple) else ()))]) for _, selection, out_selection in indexer])
         can_use_rust = is_out_index_range_able and is_nd_out and are_out_selections_tuples and is_step_size_one
 
@@ -483,22 +484,10 @@ class AsyncArray:
                         return slice(start, stop)
                     raise ValueError(f"The array {obj} does not contain consecutive integers.")
                 return obj
-            def fill_o_index(o_index_tuple, int_index_location):
-                new_selection = [0] * len(self.shape)
-                new_selection[int_index_location] = o_index_tuple[0]
-                return tuple(new_selection)
-            indexer_with_out_as_range = [(chunk_coords, chunk_selection, tuple([to_range(s) for s in out_selection]) if hasattr(out_selection, '__iter__') else out_selection) for chunk_coords, chunk_selection, out_selection in indexer]
-            
+            full_out_selections = [tuple(p.dim_out_sel if p.dim_out_sel is not None else 0 for p in dim_projections) for dim_projections in itertools.product(*indexer.dim_indexers)]
+            indexer_with_out_as_range = [(chunk_coords, chunk_selection, tuple([to_range(s) for s in full_out_selections[i]]) if hasattr(full_out_selections[i], '__iter__') else full_out_selections[i]) for i, (chunk_coords, chunk_selection, _) in enumerate(indexer)]
             true_shape = tuple(s.nitems for s in indexer.dim_indexers)
             out_shape = true_shape if len(indexer.shape) > 0 else (1, )
-
-            is_int_slice_index = all(sum(isinstance(axis_selection, int) for axis_selection in chunk_selection) not in ((len(self.shape) - 1), 0) for _, chunk_selection, _ in indexer)
-            if is_int_slice_index:
-                not_int_index_location = next(i for i,v in enumerate(list(indexer)[0][1]) if not isinstance(v, int)) 
-                return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, True, [(chunk_coords, chunk_selection, fill_o_index(out_selection, not_int_index_location)) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
-            if len(out_shape) == 1 and len(self.shape) > 1:
-                not_singleton_index_location = next(i for i,v in enumerate(list(indexer)[0][1]) if not isinstance(v, int) or not (isinstance(v, np.ndarray) and product(v.shape) > 1)) 
-                return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, False, [(chunk_coords, chunk_selection, fill_o_index(out_selection, not_singleton_index_location)) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
             return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, False, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
         # setup output buffer
         if out is not None:
