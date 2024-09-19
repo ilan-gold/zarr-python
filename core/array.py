@@ -488,19 +488,16 @@ class AsyncArray:
                 new_selection[int_index_location] = o_index_tuple[0]
                 return tuple(new_selection)
             indexer_with_out_as_range = [(chunk_coords, chunk_selection, tuple([to_range(s) for s in out_selection]) if hasattr(out_selection, '__iter__') else out_selection) for chunk_coords, chunk_selection, out_selection in indexer]
-            out_shape = indexer.shape if len(indexer.shape) > 0 else (1, )
+            
+            true_shape = tuple(s.nitems for s in indexer.dim_indexers)
+            out_shape = true_shape if len(indexer.shape) > 0 else (1, )
+
             is_int_slice_index = all(sum(isinstance(axis_selection, int) for axis_selection in chunk_selection) not in ((len(self.shape) - 1), 0) for _, chunk_selection, _ in indexer)
             if is_int_slice_index:
-                expanded_out_shape = [1] * len(self.shape)
                 not_int_index_location = next(i for i,v in enumerate(list(indexer)[0][1]) if not isinstance(v, int)) 
-                expanded_out_shape[not_int_index_location] = indexer.shape[0]
-                out_shape = tuple(expanded_out_shape)
                 return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, True, [(chunk_coords, chunk_selection, fill_o_index(out_selection, not_int_index_location)) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
             if len(out_shape) == 1 and len(self.shape) > 1:
-                expanded_out_shape = [1] * len(self.shape)
                 not_singleton_index_location = next(i for i,v in enumerate(list(indexer)[0][1]) if not isinstance(v, int) or not (isinstance(v, np.ndarray) and product(v.shape) > 1)) 
-                expanded_out_shape[not_singleton_index_location] = indexer.shape[0]
-                out_shape = tuple(expanded_out_shape)
                 return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, False, [(chunk_coords, chunk_selection, fill_o_index(out_selection, not_singleton_index_location)) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
             return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, False, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
         # setup output buffer
