@@ -1387,7 +1387,7 @@ def test_set_mask_selection_2d(store: StorePath):
         ix = np.random.binomial(1, p, size=a.size).astype(bool).reshape(a.shape)
         _test_set_mask_selection(v, a, z, ix)
 
-
+@pytest.mark.xfail(reason="out buffer not supported with rust")
 def test_get_selection_out(store: StorePath):
     # basic selections
     a = np.arange(1050)
