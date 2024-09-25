@@ -488,7 +488,7 @@ class AsyncArray:
             indexer_with_out_as_range = [(chunk_coords, chunk_selection, tuple([to_range(s) for s in full_out_selections[i]]) if hasattr(full_out_selections[i], '__iter__') else full_out_selections[i]) for i, (chunk_coords, chunk_selection, _) in enumerate(indexer)]
             true_shape = tuple(s.nitems for s in indexer.dim_indexers)
             out_shape = true_shape if len(indexer.shape) > 0 else (1, )
-            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, False, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
+            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
         # setup output buffer
         if out is not None:
             if isinstance(out, NDBuffer):
