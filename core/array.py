@@ -223,7 +223,7 @@ class AsyncArray:
             # insert user-provided data
             await result.setitem(..., data)
         if not isinstance(store_path.store, MemoryStore):
-            object.__setattr__(result, "rust_array", open_array_py(str(store_path).replace("file://", "")))
+            object.__setattr__(result, "rust_array", open_array_py(str(store_path).replace("file://", ""), 0))
         return result
 
     @classmethod
@@ -339,7 +339,7 @@ class AsyncArray:
         metadata = parse_array_metadata(data)
         rust_array_arg = {"rust_array": None}
         if not isinstance(store_path.store, MemoryStore):
-            rust_array_arg["rust_array"] = open_array_py(str(store_path).replace("file://", ""))
+            rust_array_arg["rust_array"] = open_array_py(str(store_path).replace("file://", ""), 0)
         async_array = cls(metadata=metadata, store_path=store_path, **rust_array_arg)
         return async_array
 
@@ -396,7 +396,7 @@ class AsyncArray:
                 metadata=ArrayV3Metadata.from_dict(json.loads(zarr_json_bytes.to_bytes())),
             )
             if not isinstance(store_path.store, MemoryStore):
-                object.__setattr__(arr, "rust_array", open_array_py(str(store_path).replace("file://", "")))
+                object.__setattr__(arr, "rust_array", open_array_py(str(store_path).replace("file://", ""), 0))
             return arr
 
     @property
