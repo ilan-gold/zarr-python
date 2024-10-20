@@ -224,7 +224,7 @@ class AsyncArray:
             # insert user-provided data
             await result.setitem(..., data)
         if not isinstance(store_path.store, MemoryStore):
-            object.__setattr__(result, "rust_array", open_array_py(str(store_path).replace("file://", ""), int(os.environ.get("ZARRS_PYTHON_CONCURRENCY", "0"))))
+            object.__setattr__(result, "rust_array", open_array_py(str(store_path).replace("file://", ""), int(os.environ.get("ZARRS_PYTHON_CONCURRENCY", "1"))))
         return result
 
     @classmethod
@@ -340,7 +340,7 @@ class AsyncArray:
         metadata = parse_array_metadata(data)
         rust_array_arg = {"rust_array": None}
         if not isinstance(store_path.store, MemoryStore):
-            rust_array_arg["rust_array"] = open_array_py(str(store_path).replace("file://", ""), int(os.environ.get("ZARRS_PYTHON_CONCURRENCY", "0")))
+            rust_array_arg["rust_array"] = open_array_py(str(store_path).replace("file://", ""), int(os.environ.get("ZARRS_PYTHON_CONCURRENCY", "1")))
         async_array = cls(metadata=metadata, store_path=store_path, **rust_array_arg)
         return async_array
 
@@ -397,7 +397,7 @@ class AsyncArray:
                 metadata=ArrayV3Metadata.from_dict(json.loads(zarr_json_bytes.to_bytes())),
             )
             if not isinstance(store_path.store, MemoryStore):
-                object.__setattr__(arr, "rust_array", open_array_py(str(store_path).replace("file://", ""), int(os.environ.get("ZARRS_PYTHON_CONCURRENCY", "0"))))
+                object.__setattr__(arr, "rust_array", open_array_py(str(store_path).replace("file://", ""), int(os.environ.get("ZARRS_PYTHON_CONCURRENCY", "1"))))
             return arr
 
     @property
@@ -466,30 +466,7 @@ class AsyncArray:
     ) -> NDArrayLike:
         # check fields are sensible
         out_dtype = check_fields(fields, self.dtype)
-
-        are_out_selections_tuples = all([isinstance(out_selection, tuple) for _, _, out_selection in indexer])
-        is_out_index_range_able = all([(all([(isinstance(s, np.ndarray) and np.all(np.diff(s.ravel()) == 1)) or not isinstance(s, np.ndarray) for s in out_selection]) if hasattr(out_selection, '__iter__') else out_selection) for _, _, out_selection in indexer])
-        is_nd_out = product(indexer.shape) > 0 and len(indexer.shape) > 0
-        is_step_size_one = all([all([(isinstance(s, slice) and (s.step == 1 or s.step is None)) or not isinstance(s, slice) for s in (*(selection if isinstance(selection, tuple) else ()), *(out_selection if isinstance(out_selection, tuple) else ()))]) for _, selection, out_selection in indexer])
-        can_use_rust = is_out_index_range_able and is_nd_out and are_out_selections_tuples and is_step_size_one
-
-        if can_use_rust and self.rust_array is not None:
-            # print([out_selection for _, _, out_selection in indexer], indexer.shape, self.shape)
-            def to_range(obj):
-                if isinstance(obj, np.ndarray):
-                    obj = obj.ravel()
-                    if np.all(np.diff(obj) == 1):
-                        # Get the start and stop of the range
-                        start = obj[0]
-                        stop = obj[-1] + 1  # 'stop' in slice is exclusive
-                        return slice(start, stop)
-                    raise ValueError(f"The array {obj} does not contain consecutive integers.")
-                return obj
-            full_out_selections = [tuple(p.dim_out_sel if p.dim_out_sel is not None else 0 for p in dim_projections) for dim_projections in itertools.product(*indexer.dim_indexers)]
-            indexer_with_out_as_range = [(chunk_coords, chunk_selection, tuple([to_range(s) for s in full_out_selections[i]]) if hasattr(full_out_selections[i], '__iter__') else full_out_selections[i]) for i, (chunk_coords, chunk_selection, _) in enumerate(indexer)]
-            true_shape = tuple(s.nitems for s in indexer.dim_indexers)
-            out_shape = true_shape if len(indexer.shape) > 0 else (1, )
-            return np.from_dlpack(DLPackCompat(self.rust_array.retrieve_chunk_subset(out_shape, [(chunk_coords, chunk_selection, out_selection) for chunk_coords, chunk_selection, out_selection in indexer_with_out_as_range]))).reshape(indexer.shape)
+        can_use_rust = product(indexer.shape) > 0 and len(indexer.shape) > 0
         # setup output buffer
         if out is not None:
             if isinstance(out, NDBuffer):
@@ -507,7 +484,17 @@ class AsyncArray:
                 order=self.order,
                 fill_value=self.metadata.fill_value,
             )
-        if product(indexer.shape) > 0:
+        if can_use_rust and self.rust_array is not None:
+            chunk_coords = [index[0] for index in indexer]
+            chunk_selections = [index[1] for index in indexer]
+            out_selections = [index[2] for index in indexer]
+            chunks = self.rust_array.retrieve_chunks(chunk_coords)
+            for (chunk, chunk_selection, out_selection) in zip(chunks, chunk_selections, out_selections):
+                np_chunk = np.from_dlpack(DLPackCompat(chunk))[chunk_selection]
+                if indexer.drop_axes != ():
+                    np_chunk = np_chunk.squeeze(axis=indexer.drop_axes)
+                out_buffer[out_selection] = np_chunk
+        else:
             # reading chunks and decoding them
             await self.codec_pipeline.read(
                 [
@@ -522,7 +509,9 @@ class AsyncArray:
                 out_buffer,
                 drop_axes=indexer.drop_axes,
             )
-        return out_buffer.as_ndarray_like()
+        res = out_buffer.as_ndarray_like()
+        return res
+
 
     async def getitem(
         self,
